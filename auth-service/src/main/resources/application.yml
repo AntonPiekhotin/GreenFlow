@@ -1,3 +1,26 @@
+jwt:
+  secret: ${JWT_SECRET}
+  expiration: ${JWT_EXPIRATION}
+
 spring:
   application:
     name: auth-service
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/auth-db
+    username: postgres
+    password: postgres
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: 804317373743-ct8qt00tjb7s1ooh6e1ng3ejred9pd27.apps.googleusercontent.com
+            client-secret: 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
+            scope:
+              - email
+              - profile
