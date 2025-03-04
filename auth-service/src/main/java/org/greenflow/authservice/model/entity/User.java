@@ -48,8 +48,6 @@ public class User implements UserDetails {
     @NotBlank(message = "Email is required")
     String email;
 
-    @Column(nullable = false)
-    @NotBlank(message = "Password is required")
     String password;
 
     String userName;

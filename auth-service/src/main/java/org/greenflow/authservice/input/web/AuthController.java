@@ -40,15 +40,8 @@ public class AuthController {
 
     private final PasswordEncoder encoder;
 
-
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-//        Authentication authentication = authenticationManager.authenticate(
-//                new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
-//        );
-//        String token = jwtUtils.generateToken(authentication);
-//        return ResponseEntity.ok(Collections.singletonMap("token", token));
-
         Authentication authentication;
         try {
             authentication = authenticationManager
@@ -101,20 +94,6 @@ public class AuthController {
                 .password(encoder.encode(signUpRequest.getPassword()))
                 .build();
 
-
-//        if (strRoles == null || strRoles.isEmpty()) {
-//            role = roleRepository.findByRoleName(Role.RoleType.CLIENT)
-//                    .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-//        } else {
-//            String roleStr = strRoles.iterator().next();
-//            if (roleStr.equals("admin")) {
-//                role = roleRepository.findByRoleName(Role.RoleType.ADMIN)
-//                        .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-//            } else {
-//                role = roleRepository.findByRoleName(Role.RoleType.CLIENT)
-//                        .orElseThrow(() -> new RuntimeException("Error: Role is not found."));
-//            }
-//        }
         user.setAuthProvider("email");
         user.setRoles(Role.of(Role.RoleType.CLIENT));
         userRepository.save(user);

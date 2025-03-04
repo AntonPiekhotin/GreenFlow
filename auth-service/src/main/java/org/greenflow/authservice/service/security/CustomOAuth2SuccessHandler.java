@@ -7,7 +7,6 @@ import lombok.RequiredArgsConstructor;
 import org.greenflow.authservice.model.entity.Role;
 import org.greenflow.authservice.model.entity.User;
 import org.greenflow.authservice.output.persistent.RoleRepository;
-import org.greenflow.authservice.output.persistent.UserRepository;
 import org.greenflow.authservice.service.UserService;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -35,7 +34,7 @@ public class CustomOAuth2SuccessHandler extends SavedRequestAwareAuthenticationS
     private String username;
     private String idAttributeKey;
 
-    private String frontendUrl = "frontendurl????????????";
+    private final String frontendUrl = "/frontendurl????????????";
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response,
