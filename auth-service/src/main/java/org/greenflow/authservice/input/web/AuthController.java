@@ -45,15 +45,12 @@ public class AuthController {
         if (userService.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity.badRequest().body("Error: Email is already in use!");
         }
-
         User user = userService.registerUser(signUpRequest);
-
         String jwtToken = jwtService.generateToken(user);
         LoginResponse response = LoginResponse.builder()
                 .username(user.getEmail())
                 .jwtToken(jwtToken)
                 .build();
-
         return ResponseEntity.status(201).body(response);
     }
 

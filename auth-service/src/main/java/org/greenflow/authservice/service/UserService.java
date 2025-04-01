@@ -9,7 +9,6 @@ import org.greenflow.authservice.model.entity.User;
 import org.greenflow.authservice.model.entity.role.RoleType;
 import org.greenflow.authservice.model.entity.role.Roles;
 import org.greenflow.authservice.output.persistent.UserRepository;
-import org.greenflow.authservice.service.security.JwtService;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -25,7 +24,6 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
-    private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
 
     public Optional<User> findByEmail(String email) {
