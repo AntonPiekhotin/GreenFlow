@@ -6,8 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.util.List;
-
 @Setter
 @Getter
 @Builder
@@ -16,6 +14,4 @@ import java.util.List;
 public class LoginResponse {
     private String username;
     private String jwtToken;
-    private List<String> roles;
-
 }

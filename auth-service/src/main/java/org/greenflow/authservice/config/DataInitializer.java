@@ -1,7 +1,9 @@
 package org.greenflow.authservice.config;
 
 import lombok.RequiredArgsConstructor;
-import org.greenflow.authservice.model.entity.Role;
+import org.greenflow.authservice.model.entity.role.Role;
+import org.greenflow.authservice.model.entity.role.Roles;
+import org.greenflow.authservice.model.entity.role.RoleType;
 import org.greenflow.authservice.model.entity.User;
 import org.greenflow.authservice.output.persistent.RoleRepository;
 import org.greenflow.authservice.output.persistent.UserRepository;
@@ -26,9 +28,9 @@ public class DataInitializer implements CommandLineRunner {
     }
 
     private void rolesInit() {
-        Set<Role> roles = Role.of(Role.RoleType.ADMIN,
-                Role.RoleType.MANAGER,
-                Role.RoleType.CLIENT);
+        Set<Role> roles = Roles.of(RoleType.ADMIN,
+                RoleType.MANAGER,
+                RoleType.CLIENT);
         roleRepository.saveAll(roles);
     }
 
@@ -39,7 +41,7 @@ public class DataInitializer implements CommandLineRunner {
         User admin = User.builder()
                 .email("admin@admin.com")
                 .password(passwordEncoder.encode("admin"))
-                .roles(Role.of(Role.RoleType.ADMIN, Role.RoleType.MANAGER))
+                .roles(Roles.of(RoleType.ADMIN, RoleType.MANAGER))
                 .build();
         userRepository.save(admin);
         if (userRepository.existsByEmail("manager@manager.com")) {
@@ -48,7 +50,7 @@ public class DataInitializer implements CommandLineRunner {
         User manager = User.builder()
                 .email("manager@manager.com")
                 .password(passwordEncoder.encode("manager"))
-                .roles(Role.of(Role.RoleType.MANAGER))
+                .roles(Roles.of(RoleType.MANAGER))
                 .build();
         userRepository.save(manager);
     }

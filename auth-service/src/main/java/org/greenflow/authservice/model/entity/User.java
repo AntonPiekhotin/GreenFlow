@@ -18,6 +18,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.greenflow.authservice.model.entity.role.Role;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -49,8 +50,6 @@ public class User implements UserDetails {
     String email;
 
     String password;
-
-    String userName;
 
     String name;
 

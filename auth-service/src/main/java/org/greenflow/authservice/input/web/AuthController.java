@@ -5,101 +5,56 @@ import lombok.RequiredArgsConstructor;
 import org.greenflow.authservice.model.dto.LoginRequest;
 import org.greenflow.authservice.model.dto.LoginResponse;
 import org.greenflow.authservice.model.dto.SignupRequest;
-import org.greenflow.authservice.model.entity.Role;
 import org.greenflow.authservice.model.entity.User;
-import org.greenflow.authservice.output.persistent.UserRepository;
-import org.greenflow.authservice.service.security.JwtUtils;
-import org.greenflow.authservice.service.security.UserDetailsImpl;
-import org.springframework.http.HttpStatus;
+import org.greenflow.authservice.service.UserService;
+import org.greenflow.authservice.service.security.JwtService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 @RestController
-@RequestMapping("/api/auth")
+@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
 public class AuthController {
 
-    private final AuthenticationManager authenticationManager;
-    private final JwtUtils jwtUtils;
+    private final JwtService jwtService;
 
-    private final UserRepository userRepository;
-
-    private final PasswordEncoder encoder;
+    private final UserService userService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
-        Authentication authentication;
+    public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
         try {
-            authentication = authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getUsername(),
-                            loginRequest.getPassword()));
-        } catch (AuthenticationException exception) {
-            Map<String, Object> map = new HashMap<>();
-            map.put("message", "Bad credentials");
-            map.put("status", false);
-            return new ResponseEntity<Object>(map, HttpStatus.NOT_FOUND);
+            User user = userService.login(loginRequest);
+            String jwtToken = jwtService.generateToken(user);
+            LoginResponse response = LoginResponse.builder()
+                    .username(user.getEmail())
+                    .jwtToken(jwtToken)
+                    .build();
+            return ResponseEntity.ok(response);
+        } catch (BadCredentialsException e) {
+            return ResponseEntity.badRequest().body("Invalid credentials");
         }
 
-//      Set the authentication
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
-
-        String jwtToken = jwtUtils.generateTokenFromUserDetails(userDetails);
-
-        // Collect roles from the UserDetails
-        List<String> roles = userDetails.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
-
-        // Prepare the response body, now including the JWT token directly in the body
-        LoginResponse response = LoginResponse.builder()
-                .username(userDetails.getUsername())
-                .jwtToken(jwtToken)
-                .roles(roles)
-                .build();
-
-        // Return the response entity with the JWT token included in the response body
-        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody SignupRequest signUpRequest) {
-        if (userRepository.existsByUserName(signUpRequest.getUsername())) {
-            return ResponseEntity.badRequest().body("Error: Username is already taken!");
-        }
-
-        if (userRepository.existsByEmail(signUpRequest.getEmail())) {
+        if (userService.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity.badRequest().body("Error: Email is already in use!");
         }
 
-        // Create new user's account
-        User user = User.builder()
-                .email(signUpRequest.getEmail())
-                .userName(signUpRequest.getUsername())
-                .password(encoder.encode(signUpRequest.getPassword()))
+        User user = userService.registerUser(signUpRequest);
+
+        String jwtToken = jwtService.generateToken(user);
+        LoginResponse response = LoginResponse.builder()
+                .username(user.getEmail())
+                .jwtToken(jwtToken)
                 .build();
 
-        user.setAuthProvider("email");
-        user.setRoles(Role.of(Role.RoleType.CLIENT));
-        userRepository.save(user);
-
-        return ResponseEntity.ok("User registered successfully!");
+        return ResponseEntity.status(201).body(response);
     }
-
 
 }

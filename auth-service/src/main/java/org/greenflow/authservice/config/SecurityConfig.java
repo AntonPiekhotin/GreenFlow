@@ -1,9 +1,6 @@
 package org.greenflow.authservice.config;
 
 import lombok.RequiredArgsConstructor;
-import org.greenflow.authservice.service.security.AuthEntryPointJwt;
-import org.greenflow.authservice.service.security.CustomOAuth2SuccessHandler;
-import org.greenflow.authservice.service.security.JwtAuthFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -22,10 +19,7 @@ import org.springframework.security.web.SecurityFilterChain;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final JwtAuthFilter jwtAuthenticationFilter;
     private final UserDetailsService userDetailsService;
-    private final CustomOAuth2SuccessHandler oAuth2SuccessHandler;
-    private final AuthEntryPointJwt unauthorizedHandler;
     private final PasswordEncoder passwordEncoder;
 
     @Bean
@@ -35,25 +29,9 @@ public class SecurityConfig {
                 .sessionManagement(session ->
                         session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**", "/oauth2/**").permitAll()
+                        .requestMatchers("/api/v1/auth/**").permitAll()
                         .anyRequest().authenticated()
-                )
-                .oauth2Login(oauth2 -> oauth2
-                        .successHandler(oAuth2SuccessHandler)
-                )
-//                .exceptionHandling(exception ->
-//                        exception.authenticationEntryPoint(unauthorizedHandler)
-//                )
-//                .logout(logout -> logout
-//                        .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
-//                        .logoutSuccessUrl("/")
-//                        .invalidateHttpSession(true)
-//                        .deleteCookies("JSESSIONID")
-//                )
-//                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
-
-//                .formLogin(Customizer.withDefaults())
-        ;
+                );
         return http.build();
     }
 

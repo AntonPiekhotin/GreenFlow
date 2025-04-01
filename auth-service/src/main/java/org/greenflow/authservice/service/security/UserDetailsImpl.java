@@ -30,7 +30,7 @@ public class UserDetailsImpl implements UserDetails {
 
     private Collection<? extends GrantedAuthority> authorities;
 
-    public static UserDetailsImpl build(User user) {
+    public static UserDetailsImpl fromUser(User user) {
         return new UserDetailsImpl(
                 user.getId(),
                 user.getUsername(),

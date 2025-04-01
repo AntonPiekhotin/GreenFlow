@@ -3,9 +3,8 @@ package org.greenflow.authservice.service.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import org.greenflow.authservice.model.entity.Role;
+import org.greenflow.authservice.model.entity.User;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -13,10 +12,9 @@ import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Instant;
 import java.util.Date;
-import java.util.Set;
 
 @Component
-public class JwtUtils {
+public class JwtService {
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -28,20 +26,10 @@ public class JwtUtils {
         return Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generateToken(Authentication authentication) {
+    public String generateToken(User user) {
         return Jwts.builder()
-                .subject(authentication.getName())
-                .claim("roles", authentication.getAuthorities().toString())
-                .issuedAt(Date.from(Instant.now()))
-                .expiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSigningKey())
-                .compact();
-    }
-
-    public String generateToken(String username, Set<Role> roles) {
-        return Jwts.builder()
-                .subject(username)
-                .claim("roles", roles.toString())
+                .subject(user.getEmail())
+                .claim("roles", user.getRoles().toString())
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey())
@@ -73,13 +61,4 @@ public class JwtUtils {
                 .getPayload();
     }
 
-    public String generateTokenFromUserDetails(UserDetailsImpl userDetails) {
-        return Jwts.builder()
-                .subject(userDetails.getEmail())
-                .claim("roles", userDetails.getAuthorities().toString())
-                .issuedAt(Date.from(Instant.now()))
-                .expiration(new Date(System.currentTimeMillis() + expiration))
-                .signWith(getSigningKey())
-                .compact();
-    }
 }
