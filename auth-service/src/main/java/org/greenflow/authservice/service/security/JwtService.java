@@ -4,6 +4,7 @@ import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 import org.greenflow.authservice.model.entity.User;
+import org.greenflow.authservice.model.entity.role.Role;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
@@ -11,7 +12,9 @@ import org.springframework.stereotype.Component;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtService {
@@ -27,9 +30,13 @@ public class JwtService {
     }
 
     public String generateToken(User user) {
+        String roles = user.getRoles().stream()
+                .map(Role::getAuthority)
+                .collect(Collectors.joining(","));
         return Jwts.builder()
                 .subject(user.getEmail())
-                .claim("roles", user.getRoles().toString())
+                .claim("userId", user.getId())
+                .claim("roles", roles)
                 .issuedAt(Date.from(Instant.now()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSigningKey())

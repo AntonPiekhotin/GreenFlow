@@ -24,12 +24,12 @@ public class JwtUtil {
         return extractAllClaimsFromToken(token).get("userId", String.class);
     }
 
-    public String extractRole(String token) {
-        return extractAllClaimsFromToken(token).get("role", String.class);
+    public String extractRoles(String token) {
+        return extractAllClaimsFromToken(token).get("roles", String.class);
     }
 
     public String extractEmail(String token) {
-        return extractAllClaimsFromToken(token).get("email", String.class);
+        return extractAllClaimsFromToken(token).getSubject();
     }
 
     public boolean isInvalid(String token) {
