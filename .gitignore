@@ -1,4 +1,4 @@
-/.idea/
+.idea
 .env
 .build/
 
@@ -15,4 +15,5 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 /**/gradle/
-/**/.idea/
+
+docker-compose.yml
