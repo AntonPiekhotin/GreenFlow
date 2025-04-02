@@ -1,0 +1,21 @@
+server:
+  port: 8080
+
+jwt:
+  secret: ${JWT_SECRET}
+
+spring:
+  application:
+    name: api-gateway
+
+eureka:
+  instance:
+    hostname: ${API_GATEWAY_HOSTNAME}
+    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
+
+logging:
+  level:
+    track: DEBUG
