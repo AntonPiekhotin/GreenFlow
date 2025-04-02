@@ -51,8 +51,6 @@ public class User implements UserDetails {
 
     String password;
 
-    String name;
-
     String authProvider;
 
     @ManyToMany(fetch = FetchType.EAGER)
