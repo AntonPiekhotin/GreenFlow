@@ -32,9 +32,24 @@ public class AuthenticationFilter implements GatewayFilter {
             return onError(exchange, HttpStatus.FORBIDDEN);
         }
 
-//      TODO:  updateRequest(exchange, token);
+        updateRequest(exchange, token);
 
         return chain.filter(exchange);
+    }
+
+    /**
+     * Update the request with the user information. Add info to the request headers.
+     */
+    private void updateRequest(ServerWebExchange exchange, String token) {
+        String userId = jwtUtil.extractUserId(token);
+        String role = jwtUtil.extractRole(token);
+        String email = jwtUtil.extractEmail(token);
+
+        exchange.getRequest().mutate()
+                .header("X-User-Id", userId)
+                .header("X-Role", role)
+                .header("X-Email", email)
+                .build();
     }
 
     private Mono<Void> onError(ServerWebExchange exchange, HttpStatus httpStatus) {

@@ -17,10 +17,12 @@ public class Config {
     public RouteLocator routes(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("auth-service", r -> r.path("/api/v1/auth/register")
-//                        .filters(f -> f.filter(filter))
                         .uri("lb://auth-service"))
                 .route("auth-service", r -> r.path("/api/v1/auth/login")
                         .uri("lb://auth-service"))
+                .route("client", r -> r.path("/api/v1/client/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("lb://client"))
                 .build();
     }
 }

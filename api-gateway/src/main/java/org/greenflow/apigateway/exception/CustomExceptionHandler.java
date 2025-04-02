@@ -21,4 +21,14 @@ public class CustomExceptionHandler {
         return ResponseEntity.status(status).body(error);
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ResponseErrorDto> handleException(Exception e) {
+        HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
+        var error = ResponseErrorDto.builder()
+                .statusCode(status)
+                .errorMessage(List.of("Internal server error", e.toString()))
+                .build();
+        return ResponseEntity.status(status).body(error);
+    }
+
 }
