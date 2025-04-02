@@ -15,7 +15,6 @@
       <module name="common" target="21" />
       <module name="common.main" target="21" />
       <module name="common.test" target="21" />
-      <module name="eureka.test" target="21" />
     </bytecodeTargetLevel>
   </component>
 </project>
