@@ -2,6 +2,7 @@ package org.greenflow.apigateway.filter;
 
 import lombok.RequiredArgsConstructor;
 import org.greenflow.apigateway.config.JwtUtil;
+import org.greenflow.common.model.constant.CustomHeaders;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -46,9 +47,9 @@ public class AuthenticationFilter implements GatewayFilter {
         String email = jwtUtil.extractEmail(token);
 
         ServerHttpRequest updatedRequest = exchange.getRequest().mutate()
-                .header("X-User-Id", userId)
-                .header("X-Roles", roles)
-                .header("X-Email", email)
+                .header(CustomHeaders.X_USER_ID, userId)
+                .header(CustomHeaders.X_ROLES, roles)
+                .header(CustomHeaders.X_EMAIL, email)
                 .build();
 
         return exchange.mutate().request(updatedRequest).build();

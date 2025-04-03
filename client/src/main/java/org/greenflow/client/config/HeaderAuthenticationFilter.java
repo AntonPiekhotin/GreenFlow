@@ -5,6 +5,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import org.greenflow.common.model.constant.CustomHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -14,8 +15,9 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -25,12 +27,15 @@ public class HeaderAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
             throws ServletException, IOException {
 
-        String userId = request.getHeader("X-User-Id");
-        String role = request.getHeader("X-Roles");
-        String email = request.getHeader("X-Email");
+        String userId = request.getHeader(CustomHeaders.X_USER_ID);
+        String roles = request.getHeader(CustomHeaders.X_ROLES);
+        String email = request.getHeader(CustomHeaders.X_EMAIL);
 
-        if (userId != null && role != null && email != null) {
-            List<GrantedAuthority> authorities = List.of(new SimpleGrantedAuthority(role));
+        if (userId != null && roles != null && email != null) {
+            Set<GrantedAuthority> authorities = Set.of(
+                    roles.split(",")).stream()
+                    .map(SimpleGrantedAuthority::new)
+                    .collect(Collectors.toSet());
 
             UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(
                     userId, null, authorities
