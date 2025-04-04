@@ -34,7 +34,7 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
-    public User registerUser(SignupRequest signUpRequest) {
+    public User registerUser(@Valid SignupRequest signUpRequest) {
         if (signUpRequest.getRole().equals("CLIENT")) {
             return registerClient(signUpRequest);
         } else if (signUpRequest.getRole().equals("WORKER")) {
