@@ -52,8 +52,9 @@ public class UserService {
                 .roles(Roles.of(RoleType.CLIENT))
                 .authProvider("email")
                 .build();
+        userRepository.save(user);
         log.info("Client registered: {}", user.getEmail());
-        return userRepository.save(user);
+        return user;
     }
 
     private User registerWorker(SignupRequest signUpRequest) {
@@ -63,8 +64,9 @@ public class UserService {
                 .roles(Roles.of(RoleType.WORKER))
                 .authProvider("email")
                 .build();
+        userRepository.save(user);
         log.info("Worker registered: {}", user.getEmail());
-        return userRepository.save(user);
+        return user;
     }
 
     public User login(@Valid LoginRequest request) throws BadCredentialsException {

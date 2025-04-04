@@ -30,7 +30,8 @@ public class DataInitializer implements CommandLineRunner {
     private void rolesInit() {
         Set<Role> roles = Roles.of(RoleType.ADMIN,
                 RoleType.MANAGER,
-                RoleType.CLIENT);
+                RoleType.CLIENT,
+                RoleType.WORKER);
         roleRepository.saveAll(roles);
     }
 
