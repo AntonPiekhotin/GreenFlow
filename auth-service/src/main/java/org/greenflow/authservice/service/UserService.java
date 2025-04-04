@@ -35,14 +35,35 @@ public class UserService {
     }
 
     public User registerUser(SignupRequest signUpRequest) {
+        if (signUpRequest.getRole().equals("CLIENT")) {
+            return registerClient(signUpRequest);
+        } else if (signUpRequest.getRole().equals("WORKER")) {
+            return registerWorker(signUpRequest);
+        }
+
+        // should not be reached
+        throw new IllegalArgumentException("Invalid role: " + signUpRequest.getRole());
+    }
+
+    private User registerClient(SignupRequest signUpRequest) {
         User user = User.builder()
                 .email(signUpRequest.getEmail())
                 .password(passwordEncoder.encode(signUpRequest.getPassword()))
                 .roles(Roles.of(RoleType.CLIENT))
                 .authProvider("email")
                 .build();
+        log.info("Client registered: {}", user.getEmail());
+        return userRepository.save(user);
+    }
 
-        log.info("User registered: {}", user.getEmail());
+    private User registerWorker(SignupRequest signUpRequest) {
+        User user = User.builder()
+                .email(signUpRequest.getEmail())
+                .password(passwordEncoder.encode(signUpRequest.getPassword()))
+                .roles(Roles.of(RoleType.WORKER))
+                .authProvider("email")
+                .build();
+        log.info("Worker registered: {}", user.getEmail());
         return userRepository.save(user);
     }
 
