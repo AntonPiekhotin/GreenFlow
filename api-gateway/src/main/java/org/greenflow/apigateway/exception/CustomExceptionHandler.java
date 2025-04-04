@@ -1,6 +1,7 @@
 package org.greenflow.apigateway.exception;
 
 import io.jsonwebtoken.MalformedJwtException;
+import org.greenflow.common.model.dto.ResponseErrorDto;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -15,7 +16,7 @@ public class CustomExceptionHandler {
     public ResponseEntity<ResponseErrorDto> handleMalformedJwtException(MalformedJwtException e) {
         HttpStatus status = HttpStatus.UNAUTHORIZED;
         var error = ResponseErrorDto.builder()
-                .statusCode(status)
+                .statusCode(status.value())
                 .errorMessage(List.of("Invalid token", e.toString()))
                 .build();
         return ResponseEntity.status(status).body(error);
@@ -25,7 +26,7 @@ public class CustomExceptionHandler {
     public ResponseEntity<ResponseErrorDto> handleException(Exception e) {
         HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
         var error = ResponseErrorDto.builder()
-                .statusCode(status)
+                .statusCode(status.value())
                 .errorMessage(List.of("Internal server error", e.toString()))
                 .build();
         return ResponseEntity.status(status).body(error);
