@@ -26,18 +26,13 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
-        try {
-            User user = userService.login(loginRequest);
-            String jwtToken = jwtService.generateToken(user);
-            LoginResponse response = LoginResponse.builder()
-                    .username(user.getEmail())
-                    .jwtToken(jwtToken)
-                    .build();
-            return ResponseEntity.ok(response);
-        } catch (BadCredentialsException e) {
-            return ResponseEntity.badRequest().body("Invalid credentials");
-        }
-
+        User user = userService.login(loginRequest);
+        String jwtToken = jwtService.generateToken(user);
+        LoginResponse response = LoginResponse.builder()
+                .username(user.getEmail())
+                .jwtToken(jwtToken)
+                .build();
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")

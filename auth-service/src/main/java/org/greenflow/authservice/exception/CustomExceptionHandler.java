@@ -1,8 +1,10 @@
 package org.greenflow.authservice.exception;
 
 import org.greenflow.common.model.dto.ResponseErrorDto;
+import org.greenflow.common.model.exception.GreenFlowException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,6 +16,19 @@ import java.util.stream.Collectors;
 
 @RestControllerAdvice
 public class CustomExceptionHandler {
+
+    @ExceptionHandler(GreenFlowException.class)
+    public ResponseEntity<ResponseErrorDto> handleGreenFlowException(GreenFlowException e) {
+        int status = e.getStatusCode();
+        var error = ResponseErrorDto.builder()
+                .statusCode(status)
+                .errorMessage(List.of(e.getMessage()))
+                .stackTrace(Arrays.stream(e.getStackTrace())
+                        .map(StackTraceElement::toString)
+                        .toList())
+                .build();
+        return ResponseEntity.status(status).body(error);
+    }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ResponseErrorDto> handleMethodArgumentNotValidException(
@@ -35,6 +50,19 @@ public class CustomExceptionHandler {
                 .errorMessage(errorMessages)
                 .stackTrace(e.getBindingResult().getAllErrors().stream()
                         .map(Object::toString).collect(Collectors.toList()))
+                .build();
+        return ResponseEntity.status(status).body(error);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<ResponseErrorDto> handleBadCredentialsException(BadCredentialsException e) {
+        int status = HttpStatus.UNAUTHORIZED.value();
+        var error = ResponseErrorDto.builder()
+                .statusCode(status)
+                .errorMessage(List.of(e.getMessage()))
+                .stackTrace(Arrays.stream(e.getStackTrace())
+                        .map(StackTraceElement::toString)
+                        .toList())
                 .build();
         return ResponseEntity.status(status).body(error);
     }

@@ -9,6 +9,8 @@ import org.greenflow.authservice.model.entity.User;
 import org.greenflow.authservice.model.entity.role.RoleType;
 import org.greenflow.authservice.model.entity.role.Roles;
 import org.greenflow.authservice.output.persistent.UserRepository;
+import org.greenflow.common.model.exception.GreenFlowException;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -42,7 +44,7 @@ public class UserService {
         }
 
         // should not be reached
-        throw new IllegalArgumentException("Invalid role: " + signUpRequest.getRole());
+        throw new GreenFlowException(HttpStatus.BAD_REQUEST.value(), "Invalid role: " + signUpRequest.getRole());
     }
 
     private User registerClient(SignupRequest signUpRequest) {
@@ -73,8 +75,6 @@ public class UserService {
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
-
         return findByEmail(request.getEmail()).get();
-
     }
 }
