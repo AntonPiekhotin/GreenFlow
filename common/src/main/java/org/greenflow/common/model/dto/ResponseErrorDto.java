@@ -1,4 +1,4 @@
-package org.greenflow.apigateway.exception;
+package org.greenflow.common.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AccessLevel;
@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.springframework.http.HttpStatus;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -23,7 +22,7 @@ public class ResponseErrorDto {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
     LocalDateTime time = LocalDateTime.now();
 
-    HttpStatus statusCode;
+    int statusCode;
 
     List<String> errorMessage;
 
