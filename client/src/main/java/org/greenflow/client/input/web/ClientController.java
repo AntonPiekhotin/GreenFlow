@@ -1,11 +1,11 @@
 package org.greenflow.client.input.web;
 
 import lombok.RequiredArgsConstructor;
-import org.greenflow.client.model.dto.ClientCreationDto;
 import org.greenflow.client.model.dto.ClientDto;
 import org.greenflow.client.model.entity.Client;
 import org.greenflow.client.service.ClientService;
 import org.greenflow.common.model.constant.CustomHeaders;
+import org.greenflow.common.model.dto.UserCreationDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,8 +31,8 @@ public class ClientController {
     }
 
     @PostMapping("/save")
-    public boolean saveClient(@RequestBody ClientCreationDto clientCreationDto) {
-        clientService.saveClient(clientCreationDto);
+    public boolean saveClient(@RequestBody UserCreationDto clientDto) {
+        clientService.saveClient(clientDto);
         return true;
     }
 
