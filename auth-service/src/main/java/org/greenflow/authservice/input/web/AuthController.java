@@ -6,10 +6,9 @@ import org.greenflow.authservice.model.dto.LoginRequest;
 import org.greenflow.authservice.model.dto.LoginResponse;
 import org.greenflow.authservice.model.dto.SignupRequest;
 import org.greenflow.authservice.model.entity.User;
-import org.greenflow.authservice.service.UserService;
+import org.greenflow.authservice.service.AuthService;
 import org.greenflow.authservice.service.security.JwtService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,11 +21,11 @@ public class AuthController {
 
     private final JwtService jwtService;
 
-    private final UserService userService;
+    private final AuthService authService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
-        User user = userService.login(loginRequest);
+        User user = authService.login(loginRequest);
         String jwtToken = jwtService.generateToken(user);
         LoginResponse response = LoginResponse.builder()
                 .username(user.getEmail())
@@ -37,10 +36,10 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody SignupRequest signUpRequest) {
-        if (userService.existsByEmail(signUpRequest.getEmail())) {
+        if (authService.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity.badRequest().body("Error: Email is already in use!");
         }
-        User user = userService.registerUser(signUpRequest);
+        User user = authService.registerUser(signUpRequest);
         String jwtToken = jwtService.generateToken(user);
         LoginResponse response = LoginResponse.builder()
                 .username(user.getEmail())

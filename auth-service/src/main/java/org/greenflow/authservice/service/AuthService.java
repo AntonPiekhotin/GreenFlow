@@ -6,11 +6,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.greenflow.authservice.model.dto.LoginRequest;
 import org.greenflow.authservice.model.dto.SignupRequest;
-import org.greenflow.authservice.model.dto.UserCreationDto;
 import org.greenflow.authservice.model.entity.User;
 import org.greenflow.authservice.model.entity.role.RoleType;
 import org.greenflow.authservice.model.entity.role.Roles;
 import org.greenflow.authservice.output.persistent.UserRepository;
+import org.greenflow.common.model.dto.UserCreationDto;
 import org.greenflow.common.model.exception.GreenFlowException;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -25,7 +25,7 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class UserService {
+public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
@@ -33,6 +33,7 @@ public class UserService {
     private final RestTemplate restTemplate;
 
     private static final String CLIENT_SERVICE_URL = "http://client/api/v1";
+    private static final String WORKER_SERVICE_URL = "http://worker/api/v1";
 
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
@@ -81,6 +82,12 @@ public class UserService {
                 .authProvider("email")
                 .build();
         userRepository.save(user);
+        log.debug("Worker saved in auth-service: {}", user.getEmail());
+
+        if (!saveToWorkerService(user)) {
+            throw new GreenFlowException(HttpStatus.SERVICE_UNAVAILABLE.value(), "Failed to save worker "
+                    + user.getEmail() + " in worker-service");
+        }
         log.info("Worker registered: {}", user.getEmail());
         return user;
     }
@@ -108,6 +115,26 @@ public class UserService {
             }
         } catch (Exception e) {
             log.error("Error occurred while saving client in client-service: {}", user.getEmail(), e);
+            return false;
+        }
+    }
+
+    private boolean saveToWorkerService(User user) {
+        UserCreationDto userCreationDto = UserCreationDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .build();
+        try {
+            Boolean response = restTemplate.postForObject(WORKER_SERVICE_URL + "/worker/save", userCreationDto,
+                    Boolean.class);
+            if (response != null && response) {
+                log.debug("Worker saved in worker-service: {}", user.getEmail());
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            log.error("Error occurred while saving worker in worker-service: {}", user.getEmail(), e);
             return false;
         }
     }
