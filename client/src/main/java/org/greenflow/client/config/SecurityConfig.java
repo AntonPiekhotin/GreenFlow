@@ -22,14 +22,12 @@ public class SecurityConfig {
 
     private final HeaderAuthenticationFilter headerAuthenticationFilter;
 
-    private final static String AUTH_SERVICE_ORIGIN = "http://localhost:8081";
-
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/v1/client/save").permitAll()
+                        .requestMatchers("/api/v1/client/save").permitAll() //TODO: need to secure this somehow
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(headerAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -41,14 +39,4 @@ public class SecurityConfig {
         return authentication -> SecurityContextHolder.getContext().getAuthentication();
     }
 
-    @Bean
-    public WebMvcConfigurer corsConfigurer() {
-        return new WebMvcConfigurer() {
-            public void addCorsMappings(CorsRegistry corsRegistry) {
-                corsRegistry.addMapping("/**")
-                        .allowedOrigins(AUTH_SERVICE_ORIGIN)
-                        .allowedMethods("GET", "POST", "PUT", "DELETE");
-            }
-        };
-    }
 }
