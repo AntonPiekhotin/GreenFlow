@@ -37,6 +37,18 @@ services:
     ports:
       - "5434:5432"
 
+  garden-db:
+    image: bitnami/postgresql:16.1.0-debian-11-r25
+    container_name: garden-db
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: garden-db
+    ports:
+      - "5435:5432"
+
 
 volumes:
   pg_data:
