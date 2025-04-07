@@ -1,10 +1,12 @@
 package org.greenflow.authservice.service;
 
+import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.greenflow.authservice.model.dto.LoginRequest;
 import org.greenflow.authservice.model.dto.SignupRequest;
+import org.greenflow.authservice.model.dto.UserCreationDto;
 import org.greenflow.authservice.model.entity.User;
 import org.greenflow.authservice.model.entity.role.RoleType;
 import org.greenflow.authservice.model.entity.role.Roles;
@@ -16,6 +18,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Optional;
 
@@ -27,6 +30,9 @@ public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthenticationManager authenticationManager;
+    private final RestTemplate restTemplate;
+
+    private static final String CLIENT_SERVICE_URL = "http://client/api/v1";
 
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
@@ -36,6 +42,7 @@ public class UserService {
         return userRepository.existsByEmail(email);
     }
 
+    @Transactional
     public User registerUser(@Valid SignupRequest signUpRequest) {
         if (signUpRequest.getRole().equals("CLIENT")) {
             return registerClient(signUpRequest);
@@ -54,7 +61,14 @@ public class UserService {
                 .roles(Roles.of(RoleType.CLIENT))
                 .authProvider("email")
                 .build();
-        userRepository.save(user);
+        user = userRepository.save(user);
+        log.debug("Client saved in auth-service: {}", user.getEmail());
+
+        if (!saveToClientService(user)) {
+            throw new GreenFlowException(HttpStatus.SERVICE_UNAVAILABLE.value(), "Failed to save client "
+                    + user.getEmail() + " in client-service");
+        }
+
         log.info("Client registered: {}", user.getEmail());
         return user;
     }
@@ -76,5 +90,25 @@ public class UserService {
                 new UsernamePasswordAuthenticationToken(request.getEmail(), request.getPassword())
         );
         return findByEmail(request.getEmail()).get();
+    }
+
+    private boolean saveToClientService(User user) {
+        UserCreationDto userCreationDto = UserCreationDto.builder()
+                .id(user.getId())
+                .email(user.getEmail())
+                .build();
+        try {
+            Boolean response = restTemplate.postForObject(CLIENT_SERVICE_URL + "/client/save", userCreationDto,
+                    Boolean.class);
+            if (response != null && response) {
+                log.debug("Client saved in client-service: {}", user.getEmail());
+                return true;
+            } else {
+                return false;
+            }
+        } catch (Exception e) {
+            log.error("Error occurred while saving client in client-service: {}", user.getEmail(), e);
+            return false;
+        }
     }
 }

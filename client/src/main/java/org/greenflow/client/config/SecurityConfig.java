@@ -11,6 +11,8 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 @EnableWebSecurity
@@ -20,11 +22,14 @@ public class SecurityConfig {
 
     private final HeaderAuthenticationFilter headerAuthenticationFilter;
 
+    private final static String AUTH_SERVICE_ORIGIN = "http://localhost:8081";
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/v1/client/save").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(headerAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
@@ -33,10 +38,17 @@ public class SecurityConfig {
 
     @Bean
     public AuthenticationManager authenticationManager() {
-        return authentication -> {
-            // Твій фільтр уже встановлює Authentication у SecurityContextHolder,
-            // тому тут можна просто повернути те, що вже є
-            return SecurityContextHolder.getContext().getAuthentication();
+        return authentication -> SecurityContextHolder.getContext().getAuthentication();
+    }
+
+    @Bean
+    public WebMvcConfigurer corsConfigurer() {
+        return new WebMvcConfigurer() {
+            public void addCorsMappings(CorsRegistry corsRegistry) {
+                corsRegistry.addMapping("/**")
+                        .allowedOrigins(AUTH_SERVICE_ORIGIN)
+                        .allowedMethods("GET", "POST", "PUT", "DELETE");
+            }
         };
     }
 }
