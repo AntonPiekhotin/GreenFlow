@@ -1,5 +1,6 @@
 package org.greenflow.garden.model.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.ElementCollection;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -13,6 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.greenflow.garden.model.dto.GardenDto;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.proxy.HibernateProxy;
 
@@ -34,13 +36,17 @@ public class Garden {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     Long id;
 
+    @Column(nullable = false)
     String ownerId;
 
     String name;
 
     String address;
 
+    @Column(nullable = false)
     Double latitude;
+
+    @Column(nullable = false)
     Double longitude;
 
     String description;
@@ -50,6 +56,16 @@ public class Garden {
 
     @CreationTimestamp
     Date createdAt;
+
+    public static Garden fromDto(GardenDto gardenDto) {
+        return Garden.builder()
+                .name(gardenDto.getName())
+                .address(gardenDto.getAddress())
+                .latitude(gardenDto.getLatitude())
+                .longitude(gardenDto.getLongitude())
+                .description(gardenDto.getDescription())
+                .build();
+    }
 
     @Override
     public final boolean equals(Object o) {
