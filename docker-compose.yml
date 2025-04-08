@@ -49,6 +49,18 @@ services:
     ports:
       - "5435:5432"
 
+  equipment-db:
+    image: bitnami/postgresql:16.1.0-debian-11-r25
+    container_name: equipment-db
+    volumes:
+      - pg_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: equipment-db
+    ports:
+      - "5436:5432"
+
 
 volumes:
   pg_data:
