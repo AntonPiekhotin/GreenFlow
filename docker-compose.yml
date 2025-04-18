@@ -73,6 +73,28 @@ services:
     ports:
       - "5437:5432"
 
+  rabbitmq:
+    image: rabbitmq:3.10.7-management
+    container_name: rabbitmq
+    hostname: rabbitmq
+    restart: always
+    environment:
+      - RABBITMQ_DEFAULT_USER=rmuser
+      - RABBITMQ_DEFAULT_PASS=rmpassword
+      - RABBITMQ_SERVER_ADDITIONAL_ERL_ARGS=-rabbit disk_free_limit 2147483648
+    volumes:
+      - ./rabbitmq:/var/lib/rabbitmq
+    networks:
+      greenflow:
+        aliases:
+          - rabbitmq
+    ports:
+      - "5672:5672"
+
 volumes:
   pg_data:
     driver: local
+
+networks:
+  greenflow:
+    name: greenflow
