@@ -39,7 +39,7 @@ public class OrderService {
     private void sendMessageToOpenOrder(Order order) {
         if (order.getStartDate().isAfter(LocalDate.now())) {
             try {
-                rabbitMQProducer.sendOrderCreatedMessage(order.getId());
+                rabbitMQProducer.sendOrderOpeningMessage(order.getId());
             } catch (Exception e) {
                 throw new GreenFlowException(HttpStatus.INTERNAL_SERVER_ERROR.value(),
                         "Failed to send message to RabbitMQ");

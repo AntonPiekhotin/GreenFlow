@@ -11,7 +11,7 @@ public class RabbitMQProducer {
 
     private final RabbitTemplate rabbitTemplate;
 
-    public void sendOrderCreatedMessage(String message) {
-        rabbitTemplate.convertAndSend(RabbitMQConstants.ORDER_EXCHANGE, RabbitMQConstants.ORDER_CREATION_QUEUE, message);
+    public void sendOrderOpeningMessage(String message) {
+        rabbitTemplate.convertAndSend(RabbitMQConstants.ORDER_EXCHANGE, RabbitMQConstants.ORDER_OPENING_QUEUE, message);
     }
 }

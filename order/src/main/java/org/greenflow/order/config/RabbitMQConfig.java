@@ -18,15 +18,15 @@ public class RabbitMQConfig {
         return new TopicExchange(RabbitMQConstants.ORDER_EXCHANGE);
     }
 
-    @Bean(name = "orderCreationQueue")
-    public Queue orderCreationQueue() {
-        return new Queue(RabbitMQConstants.ORDER_CREATION_QUEUE, true);
+    @Bean(name = "orderOpeningQueue")
+    public Queue orderOpeningQueue() {
+        return new Queue(RabbitMQConstants.ORDER_OPENING_QUEUE, true);
     }
 
     @Bean
-    public Binding orderCreationBinding(@Qualifier("orderCreationQueue") Queue orderQueue,
-                                        TopicExchange orderExchange) {
-        return BindingBuilder.bind(orderQueue).to(orderExchange).with("order.creation.#");
+    public Binding orderOpeningBinding(@Qualifier("orderOpeningQueue") Queue queue,
+                                       TopicExchange orderExchange) {
+        return BindingBuilder.bind(queue).to(orderExchange).with("order.opening.#");
     }
 
     @Bean(name = "orderDeletionQueue")
@@ -35,8 +35,8 @@ public class RabbitMQConfig {
     }
 
     @Bean
-    public Binding orderDeletingBinding(@Qualifier("orderDeletionQueue") Queue orderQueue,
+    public Binding orderDeletingBinding(@Qualifier("orderDeletionQueue") Queue queue,
                                         TopicExchange orderExchange) {
-        return BindingBuilder.bind(orderQueue).to(orderExchange).with("order.deletion.#");
+        return BindingBuilder.bind(queue).to(orderExchange).with("order.deletion.#");
     }
 }
