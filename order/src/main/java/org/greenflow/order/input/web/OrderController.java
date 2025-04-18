@@ -1,6 +1,7 @@
 package org.greenflow.order.input.web;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.greenflow.common.model.constant.CustomHeaders;
 import org.greenflow.order.model.dto.OrderDto;
@@ -31,7 +32,7 @@ public class OrderController {
     @PostMapping
     @PreAuthorize("hasAuthority('CLIENT')")
     public ResponseEntity<?> createOrder(@RequestHeader(CustomHeaders.X_USER_ID) String clientId,
-                                         @Valid OrderDto orderDto) {
+                                         @RequestBody @NotNull @Valid OrderDto orderDto) {
         return ResponseEntity.status(201).body(orderService.createOrder(clientId, orderDto));
     }
 

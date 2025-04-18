@@ -12,4 +12,9 @@ public class GreenFlowException extends RuntimeException {
         this.statusCode = statusCode;
     }
 
+    public GreenFlowException(int statusCode, String message, Throwable cause) {
+        super(message, cause);
+        this.statusCode = statusCode;
+    }
+
 }

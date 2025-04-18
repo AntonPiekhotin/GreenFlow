@@ -2,6 +2,7 @@ package org.greenflow.order.exception;
 
 import org.greenflow.common.model.dto.ResponseErrorDto;
 import org.greenflow.common.model.exception.GreenFlowException;
+import org.springframework.context.MessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -9,6 +10,7 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
 import java.util.Arrays;
 import java.util.List;
@@ -22,7 +24,7 @@ public class CustomExceptionHandler {
         int status = e.getStatusCode();
         var error = ResponseErrorDto.builder()
                 .statusCode(status)
-                .errorMessage(List.of(e.getMessage()))
+                .errorMessage(List.of(e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : ""))
                 .stackTrace(Arrays.stream(e.getStackTrace())
                         .map(StackTraceElement::toString)
                         .toList())
@@ -50,6 +52,23 @@ public class CustomExceptionHandler {
                 .errorMessage(errorMessages)
                 .stackTrace(e.getBindingResult().getAllErrors().stream()
                         .map(Object::toString).collect(Collectors.toList()))
+                .build();
+        return ResponseEntity.status(status).body(error);
+    }
+
+    @ExceptionHandler(HandlerMethodValidationException.class)
+    public ResponseEntity<ResponseErrorDto> handleMethodValidationException(HandlerMethodValidationException e) {
+        int status = HttpStatus.BAD_REQUEST.value();
+        List<String> errorMessages = e.getParameterValidationResults().stream()
+                .flatMap(validationResult -> validationResult.getResolvableErrors().stream()
+                        .map(MessageSourceResolvable::getDefaultMessage))
+                .collect(Collectors.toList());
+        var error = ResponseErrorDto.builder()
+                .statusCode(status)
+                .errorMessage(errorMessages)
+                .stackTrace(Arrays.stream(e.getStackTrace())
+                        .map(StackTraceElement::toString)
+                        .toList())
                 .build();
         return ResponseEntity.status(status).body(error);
     }

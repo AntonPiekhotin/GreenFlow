@@ -6,6 +6,8 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -20,7 +22,7 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 @Entity
-@Table(name = "order")
+@Table(name = "orders")
 @Builder
 @Getter
 @Setter
@@ -40,6 +42,16 @@ public class Order {
     String gardenId;
 
     @Column(nullable = false)
+    @Min(value = -180, message = "Longitude must be between -180 and 180")
+    @Max(value = 180, message = "Longitude must be between -180 and 180")
+    Double longitude;
+
+    @Column(nullable = false)
+    @Min(value = -90, message = "Latitude must be between -90 and 90")
+    @Max(value = 90, message = "Latitude must be between -90 and 90")
+    Double latitude;
+
+    @Column(nullable = false)
     LocalDate startDate;
 
     String status;
@@ -47,16 +59,6 @@ public class Order {
     String workerId;
 
     String description;
-
-    public static Order fromDto(OrderDto orderDto) {
-        return Order.builder()
-                .gardenId(orderDto.getGardenId())
-                .startDate(orderDto.getStartDate())
-                .status(orderDto.getStatus())
-                .workerId(orderDto.getWorkerId())
-                .description(orderDto.getDescription())
-                .build();
-    }
 
     @Override
     public final boolean equals(Object o) {
