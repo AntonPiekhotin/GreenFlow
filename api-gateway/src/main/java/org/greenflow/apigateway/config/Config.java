@@ -26,6 +26,9 @@ public class Config {
                 .route("garden", r -> r.path("/api/v1/garden/**")
                         .filters(f -> f.filter(filter))
                         .uri("lb://garden"))
+                .route("order", r -> r.path("/api/v1/order/**")
+                        .filters(f -> f.filter(filter))
+                        .uri("lb://order"))
                 .build();
     }
 }
