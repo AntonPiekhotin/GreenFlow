@@ -9,9 +9,11 @@ import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.order.model.dto.OrderDto;
 import org.greenflow.order.model.entity.Order;
 import org.greenflow.order.output.persistent.OrderRepository;
+import org.greenflow.order.output.producer.RabbitMQProducer;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -22,13 +24,27 @@ public class OrderService {
     private static final String FORBIDDEN_MESSAGE = "You do not have access to this resource";
     private final OrderRepository orderRepository;
 
+    private final RabbitMQProducer rabbitMQProducer;
+
     public Order createOrder(@NotBlank String clientId, @Valid @NotNull OrderDto orderDto) {
         Order order = Order.fromDto(orderDto);
         order.setClientId(clientId);
         order = orderRepository.save(order);
         log.info("Client {} created order: {}", order.getClientId(), order.getId());
-        return order;
 
+        sendMessageToOpenOrder(order);
+        return order;
+    }
+
+    private void sendMessageToOpenOrder(Order order) {
+        if (order.getStartDate().isAfter(LocalDate.now())) {
+            try {
+                rabbitMQProducer.sendOrderCreatedMessage(order.getId());
+            } catch (Exception e) {
+                throw new GreenFlowException(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                        "Failed to send message to RabbitMQ");
+            }
+        }
     }
 
     public List<Order> getOrdersByOwnerId(@NotBlank String clientId) {

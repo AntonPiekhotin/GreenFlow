@@ -14,6 +14,12 @@ spring:
     hibernate:
       ddl-auto: create-drop
 
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
 eureka:
   instance:
     prefer-ip-address: true
