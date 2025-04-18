@@ -1,4 +1,4 @@
-package org.greenflow.order.output.producer;
+package org.greenflow.order.output.event;
 
 import lombok.RequiredArgsConstructor;
 import org.greenflow.common.model.constant.RabbitMQConstants;

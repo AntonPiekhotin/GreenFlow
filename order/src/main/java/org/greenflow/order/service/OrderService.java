@@ -9,7 +9,7 @@ import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.order.model.dto.OrderDto;
 import org.greenflow.order.model.entity.Order;
 import org.greenflow.order.output.persistent.OrderRepository;
-import org.greenflow.order.output.producer.RabbitMQProducer;
+import org.greenflow.order.output.event.RabbitMQProducer;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
