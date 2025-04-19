@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.greenflow.common.model.dto.event.OrderDeletionMessageDto;
 import org.greenflow.common.model.dto.event.OrderOpeningMessageDto;
 import org.greenflow.openorder.model.dto.OpenOrderDto;
 import org.greenflow.openorder.model.dto.OpenOrdersRequestDto;
@@ -115,4 +116,9 @@ public class OpenOrderService {
                 .toList();
     }
 
+    public void deleteOpenOrder(OrderDeletionMessageDto order) {
+        redisTemplate.opsForGeo().remove(GEO_KEY, order.getOrderId());
+        redisTemplate.delete(HASH_KEY_PREFIX + order.getOrderId());
+        log.info("Deleted open order with ID: {}", order.getOrderId());
+    }
 }

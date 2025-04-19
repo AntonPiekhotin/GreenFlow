@@ -49,6 +49,7 @@ public class OrderService {
             throw new GreenFlowException(HttpStatus.FORBIDDEN.value(), FORBIDDEN_MESSAGE);
         }
         orderRepository.delete(order);
+        rabbitMQProducer.sendOrderDeletionMessage(order);
         log.info("Client {} deleted order: {}", clientId, order.getId());
     }
 

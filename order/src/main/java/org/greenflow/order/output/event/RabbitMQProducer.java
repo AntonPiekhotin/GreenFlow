@@ -3,6 +3,7 @@ package org.greenflow.order.output.event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.greenflow.common.model.constant.RabbitMQConstants;
+import org.greenflow.common.model.dto.event.OrderDeletionMessageDto;
 import org.greenflow.common.model.dto.event.OrderOpeningMessageDto;
 import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.order.model.entity.Order;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 @Slf4j
 public class RabbitMQProducer {
 
+    public static final String FAILED_TO_SEND_MESSAGE_TO_RABBIT_MQ = "Failed to send message to RabbitMQ";
     private final RabbitTemplate rabbitTemplate;
 
     public void sendOrderOpeningMessage(Order order) {
@@ -35,7 +37,21 @@ public class RabbitMQProducer {
             log.info("Order opening message sent to RabbitMQ: {}", orderOpeningMessage.getOrderId());
         } catch (Exception e) {
             throw new GreenFlowException(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-                    "Failed to send message to RabbitMQ", e);
+                    FAILED_TO_SEND_MESSAGE_TO_RABBIT_MQ, e);
+        }
+    }
+
+    public void sendOrderDeletionMessage(Order order) {
+        try {
+            var orderDeletionMessage = OrderDeletionMessageDto.builder()
+                    .orderId(order.getId())
+                    .build();
+            rabbitTemplate.convertAndSend(RabbitMQConstants.ORDER_EXCHANGE, RabbitMQConstants.ORDER_DELETION_QUEUE,
+                    orderDeletionMessage);
+            log.info("Order deletion message sent to RabbitMQ: {}", orderDeletionMessage.getOrderId());
+        } catch (Exception e) {
+            throw new GreenFlowException(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    FAILED_TO_SEND_MESSAGE_TO_RABBIT_MQ, e);
         }
     }
 }
