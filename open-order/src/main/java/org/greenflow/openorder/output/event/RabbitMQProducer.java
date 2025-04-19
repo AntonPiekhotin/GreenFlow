@@ -2,7 +2,6 @@ package org.greenflow.openorder.output.event;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.greenflow.common.model.constant.RabbitMQConstants;
 import org.greenflow.common.model.dto.event.OrderAssignedMessageDto;
 import org.greenflow.common.model.exception.GreenFlowException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
