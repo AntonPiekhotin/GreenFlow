@@ -1,5 +1,6 @@
 package org.greenflow.order.service.mapper;
 
+import org.greenflow.order.model.dto.OrderCreationDto;
 import org.greenflow.order.model.dto.OrderDto;
 import org.greenflow.order.model.entity.Order;
 import org.mapstruct.Mapper;
@@ -13,5 +14,7 @@ public interface OrderMapper {
     OrderDto toDto(Order order);
 
     Order toEntity(OrderDto orderDto);
+
+    Order toEntity(OrderCreationDto orderCreationDto);
 
 }

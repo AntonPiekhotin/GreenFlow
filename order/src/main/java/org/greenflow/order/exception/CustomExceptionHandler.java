@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.HandlerMethodValidationException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -22,9 +23,14 @@ public class CustomExceptionHandler {
     @ExceptionHandler(GreenFlowException.class)
     public ResponseEntity<ResponseErrorDto> handleGreenFlowException(GreenFlowException e) {
         int status = e.getStatusCode();
+        List<String> errorMessages = new ArrayList<>();
+        if (e.getCause() != null) {
+            errorMessages.add(e.getCause().getMessage());
+        }
+        errorMessages.add(e.getMessage());
         var error = ResponseErrorDto.builder()
                 .statusCode(status)
-                .errorMessage(List.of(e.getMessage(), e.getCause() != null ? e.getCause().getMessage() : ""))
+                .errorMessage(errorMessages)
                 .stackTrace(Arrays.stream(e.getStackTrace())
                         .map(StackTraceElement::toString)
                         .toList())

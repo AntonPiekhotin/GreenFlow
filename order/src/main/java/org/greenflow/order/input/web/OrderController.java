@@ -4,7 +4,9 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.greenflow.common.model.constant.CustomHeaders;
+import org.greenflow.order.model.dto.OrderCreationDto;
 import org.greenflow.order.model.dto.OrderDto;
+import org.greenflow.order.model.dto.OrderUpdateDto;
 import org.greenflow.order.model.entity.Order;
 import org.greenflow.order.service.OrderService;
 import org.springframework.http.ResponseEntity;
@@ -32,13 +34,13 @@ public class OrderController {
     @PostMapping
     @PreAuthorize("hasAuthority('CLIENT')")
     public ResponseEntity<?> createOrder(@RequestHeader(CustomHeaders.X_USER_ID) String clientId,
-                                         @RequestBody @NotNull @Valid OrderDto orderDto) {
+                                         @RequestBody @NotNull @Valid OrderCreationDto orderDto) {
         return ResponseEntity.status(201).body(orderService.createOrder(clientId, orderDto));
     }
 
     @GetMapping("/my")
     @PreAuthorize("hasAuthority('CLIENT')")
-    public ResponseEntity<?> getMyOffers(@RequestHeader(CustomHeaders.X_USER_ID) String clientId) {
+    public ResponseEntity<?> getMyOrders(@RequestHeader(CustomHeaders.X_USER_ID) String clientId) {
         List<Order> orders = orderService.getOrdersByOwnerId(clientId);
         if (orders.isEmpty()) {
             return ResponseEntity.status(204).body(Collections.emptyList());
@@ -51,14 +53,14 @@ public class OrderController {
     public ResponseEntity<?> deleteOrder(@RequestHeader(CustomHeaders.X_USER_ID) String clientId,
                                          @PathVariable String orderId) {
         orderService.deleteOrder(clientId, orderId);
-        return ResponseEntity.status(204).body("Order deleted successfully");
+        return ResponseEntity.status(200).body("Order deleted successfully");
     }
 
     @PutMapping("/{orderId}")
     @PreAuthorize("hasAuthority('CLIENT')")
     public ResponseEntity<?> updateOrder(@RequestHeader(CustomHeaders.X_USER_ID) String clientId,
                                          @PathVariable String orderId,
-                                         @RequestBody @Valid OrderDto orderDto) {
+                                         @RequestBody @Valid OrderUpdateDto orderDto) {
         Order order = orderService.updateOrder(clientId, orderId, orderDto);
         return ResponseEntity.ok(order);
     }

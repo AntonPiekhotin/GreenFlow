@@ -15,7 +15,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
-import org.greenflow.order.model.dto.OrderDto;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDate;
@@ -39,7 +38,7 @@ public class Order {
     String clientId;
 
     @Column(nullable = false)
-    String gardenId;
+    Long gardenId;
 
     @Column(nullable = false)
     @Min(value = -180, message = "Longitude must be between -180 and 180")

@@ -6,7 +6,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.greenflow.common.model.exception.GreenFlowException;
-import org.greenflow.order.model.dto.OrderDto;
+import org.greenflow.order.model.dto.OrderCreationDto;
+import org.greenflow.order.model.dto.OrderUpdateDto;
 import org.greenflow.order.model.entity.Order;
 import org.greenflow.order.output.event.RabbitMQProducer;
 import org.greenflow.order.output.persistent.OrderRepository;
@@ -22,11 +23,12 @@ import java.util.List;
 public class OrderService {
 
     private static final String FORBIDDEN_MESSAGE = "You do not have access to this resource";
+    public static final String ORDER_NOT_FOUND_MESSAGE = "Order not found";
 
     private final OrderRepository orderRepository;
     private final RabbitMQProducer rabbitMQProducer;
 
-    public Order createOrder(@NotBlank String clientId, @Valid @NotNull OrderDto orderDto) {
+    public Order createOrder(@NotBlank String clientId, @Valid @NotNull OrderCreationDto orderDto) {
         Order order = OrderMapper.INSTANCE.toEntity(orderDto);
         order.setClientId(clientId);
         order = orderRepository.save(order);
@@ -42,7 +44,7 @@ public class OrderService {
 
     public void deleteOrder(@NotBlank String clientId, @NotBlank String orderId) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new GreenFlowException(HttpStatus.NOT_FOUND.value(), "Order not found"));
+                .orElseThrow(() -> new GreenFlowException(HttpStatus.NOT_FOUND.value(), ORDER_NOT_FOUND_MESSAGE));
         if (!order.getClientId().equals(clientId)) {
             throw new GreenFlowException(HttpStatus.FORBIDDEN.value(), FORBIDDEN_MESSAGE);
         }
@@ -50,9 +52,10 @@ public class OrderService {
         log.info("Client {} deleted order: {}", clientId, order.getId());
     }
 
-    public Order updateOrder(@NotBlank String userId, @NotBlank String orderId, @NotNull @Valid OrderDto orderDto) {
+    public Order updateOrder(@NotBlank String userId, @NotBlank String orderId,
+                             @NotNull @Valid OrderUpdateDto orderDto) {
         Order order = orderRepository.findById(orderId)
-                .orElseThrow(() -> new GreenFlowException(HttpStatus.NOT_FOUND.value(), "Order not found"));
+                .orElseThrow(() -> new GreenFlowException(HttpStatus.NOT_FOUND.value(), ORDER_NOT_FOUND_MESSAGE));
         if (!order.getClientId().equals(userId)) {
             throw new GreenFlowException(HttpStatus.FORBIDDEN.value(), FORBIDDEN_MESSAGE);
         }

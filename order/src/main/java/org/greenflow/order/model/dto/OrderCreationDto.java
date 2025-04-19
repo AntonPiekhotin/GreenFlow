@@ -18,9 +18,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class OrderDto {
-
-    String clientId;
+public class OrderCreationDto {
 
     @NotNull(message = "Garden ID cannot be null")
     Long gardenId;
@@ -37,10 +35,6 @@ public class OrderDto {
 
     @NotNull(message = "Start date cannot be null")
     LocalDate startDate;
-
-    String status;
-
-    String workerId;
 
     String description;
 }
