@@ -16,3 +16,4 @@ out/
 !**/src/test/**/out/
 /**/gradle/
 /rabbitmq/
+/redis/

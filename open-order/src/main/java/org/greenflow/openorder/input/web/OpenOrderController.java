@@ -18,7 +18,7 @@ public class OpenOrderController {
     @GetMapping
     @PreAuthorize("hasAuthority('WORKER')")
     public ResponseEntity<?> getOpenOrders() {
-        return ResponseEntity.ok(openOrderService.getOpenOrders());
+        return ResponseEntity.ok(null);
     }
 
 }
