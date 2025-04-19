@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.greenflow.common.model.dto.event.OrderAssignedMessageDto;
 import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.order.model.dto.OrderCreationDto;
 import org.greenflow.order.model.dto.OrderUpdateDto;
@@ -63,5 +64,19 @@ public class OrderService {
         order.setStartDate(orderDto.getStartDate());
         order.setDescription(orderDto.getDescription());
         return orderRepository.save(order);
+    }
+
+    public void processOrderAssignedMessage(@NotNull OrderAssignedMessageDto orderMessage) {
+        Order orderEntity = orderRepository.findById(orderMessage.getOrderId())
+                .orElseThrow(() -> new GreenFlowException(HttpStatus.NOT_FOUND.value(), ORDER_NOT_FOUND_MESSAGE));
+        if (orderEntity.getWorkerId() != null && orderEntity.getWorkerId().equals(orderMessage.getWorkerId())) {
+            throw new GreenFlowException(HttpStatus.FORBIDDEN.value(), "Order already assigned to this worker");
+        }
+        if (orderEntity.getWorkerId() != null && !orderEntity.getWorkerId().isEmpty()) {
+            throw new GreenFlowException(HttpStatus.FORBIDDEN.value(), "Order already assigned to a worker");
+        }
+        orderEntity.setWorkerId(orderMessage.getWorkerId());
+        orderRepository.save(orderEntity);
+        log.info("Order {} assigned to worker {}", orderMessage.getOrderId(), orderMessage.getWorkerId());
     }
 }

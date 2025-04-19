@@ -53,5 +53,16 @@ public class RabbitMQConfig {
         return BindingBuilder.bind(queue).to(orderExchange).with("order.deletion.#");
     }
 
+    @Bean(name = "orderAssignedQueue")
+    public Queue orderAssignedQueue() {
+        return new Queue(RabbitMQConstants.ORDER_ASSIGNED_QUEUE, true);
+    }
+
+    @Bean
+    public Binding orderAssignedBinding(@Qualifier("orderAssignedQueue") Queue queue,
+                                        TopicExchange orderExchange) {
+        return BindingBuilder.bind(queue).to(orderExchange).with("order.assigned.#");
+    }
+
 
 }

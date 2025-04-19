@@ -2,12 +2,16 @@ package org.greenflow.openorder.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.greenflow.common.model.dto.event.OrderAssignedMessageDto;
 import org.greenflow.common.model.dto.event.OrderDeletionMessageDto;
 import org.greenflow.common.model.dto.event.OrderOpeningMessageDto;
+import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.openorder.model.dto.OpenOrderDto;
 import org.greenflow.openorder.model.dto.OpenOrdersRequestDto;
+import org.greenflow.openorder.output.event.RabbitMQProducer;
 import org.springframework.data.geo.Circle;
 import org.springframework.data.geo.Distance;
 import org.springframework.data.geo.GeoResults;
@@ -15,6 +19,7 @@ import org.springframework.data.geo.Point;
 import org.springframework.data.redis.connection.RedisGeoCommands;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
@@ -32,6 +37,7 @@ public class OpenOrderService {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final RabbitMQProducer rabbitMQProducer;
 
     /**
      * Saves an open order to Redis, storing its geospatial data and details.
@@ -117,8 +123,34 @@ public class OpenOrderService {
     }
 
     public void deleteOpenOrder(OrderDeletionMessageDto order) {
-        redisTemplate.opsForGeo().remove(GEO_KEY, order.getOrderId());
-        redisTemplate.delete(HASH_KEY_PREFIX + order.getOrderId());
-        log.info("Deleted open order with ID: {}", order.getOrderId());
+        deleteOpenOrderFromRedis(order.getOrderId());
+    }
+
+    private void deleteOpenOrderFromRedis(String orderId) {
+        redisTemplate.opsForGeo().remove(GEO_KEY, orderId);
+        redisTemplate.delete(HASH_KEY_PREFIX + orderId);
+        log.info("Deleted open order with ID: {}", orderId);
+    }
+
+    @Transactional
+    public void assignOrderToWorker(@NotBlank String orderId, @NotBlank String workerId) {
+        var foundOrder = redisTemplate.opsForValue().get(HASH_KEY_PREFIX + orderId);
+        if (foundOrder == null) {
+            log.error("Order with ID {} not found", orderId);
+            throw new GreenFlowException(404, "Order not found");
+        }
+        // send order assigned message to rabbitMQ, delete from redis
+        try {
+            var orderAssignedMessage = OrderAssignedMessageDto.builder()
+                    .orderId(orderId)
+                    .workerId(workerId)
+                    .build();
+            rabbitMQProducer.sendOrderAssignedMessage(orderAssignedMessage);
+            deleteOpenOrderFromRedis(orderId);
+            log.info("Order with ID {} assigned to worker {}", orderId, workerId);
+        } catch (Exception e) {
+            log.error("Failed to assign order with ID {} to worker {}", orderId, workerId, e);
+            throw new GreenFlowException(500, "Failed to assign order", e);
+        }
     }
 }
