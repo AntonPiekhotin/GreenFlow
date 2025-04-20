@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.greenflow.common.model.dto.event.OrderAssignedMessageDto;
 import org.greenflow.common.model.exception.GreenFlowException;
+import org.greenflow.order.model.constant.OrderStatus;
 import org.greenflow.order.model.dto.OrderCreationDto;
 import org.greenflow.order.model.dto.OrderUpdateDto;
 import org.greenflow.order.model.entity.Order;
@@ -32,8 +33,13 @@ public class OrderService {
     public Order createOrder(@NotBlank String clientId, @Valid @NotNull OrderCreationDto orderDto) {
         Order order = OrderMapper.INSTANCE.toEntity(orderDto);
         order.setClientId(clientId);
+        order.setStatus(OrderStatus.CREATED);
         order = orderRepository.save(order);
+
         rabbitMQProducer.sendOrderOpeningMessage(order);
+
+        order.setStatus(OrderStatus.OPEN);
+        order = orderRepository.save(order);
 
         log.info("Client {} created order: {}", order.getClientId(), order.getId());
         return order;
@@ -49,8 +55,10 @@ public class OrderService {
         if (!order.getClientId().equals(clientId)) {
             throw new GreenFlowException(HttpStatus.FORBIDDEN.value(), FORBIDDEN_MESSAGE);
         }
-        orderRepository.delete(order);
         rabbitMQProducer.sendOrderDeletionMessage(order);
+
+        order.setStatus(OrderStatus.CANCELLED);
+        orderRepository.save(order);
         log.info("Client {} deleted order: {}", clientId, order.getId());
     }
 
@@ -76,6 +84,7 @@ public class OrderService {
             throw new GreenFlowException(HttpStatus.FORBIDDEN.value(), "Order already assigned to a worker");
         }
         orderEntity.setWorkerId(orderMessage.getWorkerId());
+        orderEntity.setStatus(OrderStatus.ASSIGNED);
         orderRepository.save(orderEntity);
         log.info("Order {} assigned to worker {}", orderMessage.getOrderId(), orderMessage.getWorkerId());
     }

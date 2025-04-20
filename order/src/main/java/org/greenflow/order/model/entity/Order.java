@@ -2,6 +2,8 @@ package org.greenflow.order.model.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -15,6 +17,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.greenflow.order.model.constant.OrderStatus;
 import org.hibernate.proxy.HibernateProxy;
 
 import java.time.LocalDate;
@@ -53,7 +56,9 @@ public class Order {
     @Column(nullable = false)
     LocalDate startDate;
 
-    String status;
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    OrderStatus status;
 
     String workerId;
 
