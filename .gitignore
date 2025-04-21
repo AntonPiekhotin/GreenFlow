@@ -17,3 +17,4 @@ out/
 /**/gradle/
 /rabbitmq/
 /redis/
+/mongo/

@@ -49,18 +49,6 @@ services:
     ports:
       - "5435:5432"
 
-  equipment-db:
-    image: bitnami/postgresql:16.1.0-debian-11-r25
-    container_name: equipment-db
-    volumes:
-      - pg_data:/var/lib/postgresql/data
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_DB: equipment-db
-    ports:
-      - "5436:5432"
-
   order-db:
     image: bitnami/postgresql:16.1.0-debian-11-r25
     container_name: order-db
@@ -107,6 +95,23 @@ services:
       - ./redis:/data
     ports:
       - "6379:6379"
+
+  equipment-db:
+    image: mongo:latest
+    container_name: equipment-db
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USERNAME}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
+      MONGO_INITDB_DATABASE: equipment-db
+    volumes:
+      - ./mongo:/data/db
+    networks:
+        greenflow:
+            aliases:
+            - equipment-db
+    ports:
+      - "27017:27017"
 
 volumes:
   pg_data:
