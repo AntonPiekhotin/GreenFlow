@@ -29,7 +29,7 @@ public class Worker {
 
     String email;
 
-    String firsName;
+    String firstName;
 
     String lastName;
 
