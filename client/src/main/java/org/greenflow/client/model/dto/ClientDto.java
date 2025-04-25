@@ -1,5 +1,7 @@
 package org.greenflow.client.model.dto;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -15,6 +17,8 @@ import org.greenflow.client.model.entity.Client;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ClientDto {
 
+    @NotBlank
+    @Email
     String email;
 
     String firstName;
@@ -25,13 +29,4 @@ public class ClientDto {
 
     String city;
 
-    public static ClientDto fromEntity(Client client) {
-        return ClientDto.builder()
-                .email(client.getEmail())
-                .firstName(client.getFirstName())
-                .lastName(client.getLastName())
-                .phone(client.getPhone())
-                .city(client.getCity())
-                .build();
-    }
 }

@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.DocumentReference;
@@ -16,7 +17,7 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference;
 @Document(collection = "equipment")
 @Getter
 @Setter(onParam_ = @NonNull)
-@Builder
+@SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
