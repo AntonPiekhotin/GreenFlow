@@ -3,7 +3,6 @@ package org.greenflow.client.input.web;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.greenflow.client.model.dto.ClientDto;
-import org.greenflow.client.model.entity.Client;
 import org.greenflow.client.service.ClientService;
 import org.greenflow.common.model.constant.CustomHeaders;
 import org.greenflow.common.model.dto.UserCreationDto;

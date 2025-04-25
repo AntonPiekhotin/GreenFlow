@@ -8,7 +8,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
-import org.greenflow.client.model.entity.Client;
 
 @Data
 @AllArgsConstructor
