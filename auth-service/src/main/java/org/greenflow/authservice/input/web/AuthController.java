@@ -8,11 +8,14 @@ import org.greenflow.authservice.model.dto.SignupRequest;
 import org.greenflow.authservice.model.entity.User;
 import org.greenflow.authservice.service.AuthService;
 import org.greenflow.authservice.service.security.JwtService;
+import org.greenflow.common.model.dto.ResponseErrorDto;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -37,7 +40,10 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody SignupRequest signUpRequest) {
         if (authService.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity.badRequest().body("Error: Email is already in use!");
+            return ResponseEntity.badRequest().body(ResponseErrorDto.builder()
+                    .statusCode(400)
+                    .errorMessage(List.of("Email is already in use!"))
+                    .build());
         }
         User user = authService.registerUser(signUpRequest);
         String jwtToken = jwtService.generateToken(user);

@@ -17,7 +17,7 @@ public class ClientDto {
 
     String email;
 
-    String firsName;
+    String firstName;
 
     String lastName;
 
@@ -28,7 +28,7 @@ public class ClientDto {
     public static ClientDto fromEntity(Client client) {
         return ClientDto.builder()
                 .email(client.getEmail())
-                .firsName(client.getFirsName())
+                .firstName(client.getFirstName())
                 .lastName(client.getLastName())
                 .phone(client.getPhone())
                 .city(client.getCity())

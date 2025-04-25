@@ -6,6 +6,7 @@ import org.greenflow.common.model.constant.CustomHeaders;
 import org.greenflow.garden.model.dto.GardenDto;
 import org.greenflow.garden.model.entity.Garden;
 import org.greenflow.garden.service.GardenService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -18,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController
@@ -33,7 +33,7 @@ public class GardenController {
     public ResponseEntity<?> getMyGardens(@RequestHeader(CustomHeaders.X_USER_ID) String userId) {
         List<Garden> gardens = gardenService.getGardensByOwnerId(userId);
         if (gardens.isEmpty()) {
-            return ResponseEntity.status(204).body(Collections.emptyList());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of());
         }
         return ResponseEntity.ok(gardens);
     }

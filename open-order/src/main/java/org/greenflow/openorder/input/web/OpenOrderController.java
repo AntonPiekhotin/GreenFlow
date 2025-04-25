@@ -29,7 +29,7 @@ public class OpenOrderController {
     public ResponseEntity<?> getOpenOrders(@RequestBody @Valid OpenOrdersRequestDto request) {
         var openOrders = openOrderService.getOpenOrdersWithinRadius(request);
         if (openOrders.isEmpty()) {
-            return ResponseEntity.status(204).body(List.of());
+            return ResponseEntity.status(404).body(List.of());
         }
         return ResponseEntity.ok(openOrders);
     }

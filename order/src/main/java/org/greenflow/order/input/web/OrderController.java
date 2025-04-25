@@ -5,7 +5,6 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.greenflow.common.model.constant.CustomHeaders;
 import org.greenflow.order.model.dto.OrderCreationDto;
-import org.greenflow.order.model.dto.OrderDto;
 import org.greenflow.order.model.dto.OrderUpdateDto;
 import org.greenflow.order.model.entity.Order;
 import org.greenflow.order.service.OrderService;
@@ -43,7 +42,7 @@ public class OrderController {
     public ResponseEntity<?> getMyOrders(@RequestHeader(CustomHeaders.X_USER_ID) String clientId) {
         List<Order> orders = orderService.getOrdersByOwnerId(clientId);
         if (orders.isEmpty()) {
-            return ResponseEntity.status(204).body(Collections.emptyList());
+            return ResponseEntity.status(404).body(Collections.emptyList());
         }
         return ResponseEntity.ok(orders);
     }
@@ -53,7 +52,7 @@ public class OrderController {
     public ResponseEntity<?> deleteOrder(@RequestHeader(CustomHeaders.X_USER_ID) String clientId,
                                          @PathVariable String orderId) {
         orderService.deleteOrder(clientId, orderId);
-        return ResponseEntity.status(200).body("Order deleted successfully");
+        return ResponseEntity.status(204).body("Order deleted successfully");
     }
 
     @PutMapping("/{orderId}")
