@@ -13,16 +13,25 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
+import java.util.List;
+
 @RefreshScope
 @Component
 @RequiredArgsConstructor
 public class AuthenticationFilter implements GatewayFilter {
 
     private final JwtUtil jwtUtil;
+    private static final List<String> CLOSED_ROUTES = List.of(
+            "/api/v1/worker/save",
+            "/api/v1/client/save"
+    );
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
+        if (isClosedPath(request)) {
+            return onError(exchange, HttpStatus.FORBIDDEN);
+        }
 
         if (isAuthMissing(request)) {
             return onError(exchange, HttpStatus.UNAUTHORIZED);
@@ -67,5 +76,10 @@ public class AuthenticationFilter implements GatewayFilter {
 
     private boolean isAuthMissing(ServerHttpRequest request) {
         return !request.getHeaders().containsKey("Authorization");
+    }
+
+    private boolean isClosedPath(ServerHttpRequest request) {
+        String path = request.getURI().getPath();
+        return CLOSED_ROUTES.stream().anyMatch(path::contains);
     }
 }
