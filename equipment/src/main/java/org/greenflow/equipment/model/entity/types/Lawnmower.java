@@ -10,7 +10,7 @@ import lombok.experimental.FieldDefaults;
 import org.greenflow.equipment.model.entity.Equipment;
 import org.springframework.data.annotation.TypeAlias;
 
-@TypeAlias("LAWNMOWER")
+@TypeAlias("lawnmower")
 @Getter
 @Setter
 @Builder
