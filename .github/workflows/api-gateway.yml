@@ -23,7 +23,7 @@ jobs:
         run: chmod +x api-gateway/gradlew
 
       - name: Publish common to mavenLocal
-        run: cd common ./gradlew publishToMavenLocal
+        run: cd common && ./gradlew publishToMavenLocal
 
       - name: Build with Gradle
         run: cd api-gateway && ./gradlew build
