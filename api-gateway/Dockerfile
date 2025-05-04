@@ -1,5 +1,5 @@
 # етап 1: збірка
-FROM gradle:8.6 AS builder
+FROM gradle:8.6-jdk21 AS builder
 WORKDIR /home/gradle/project
 
 # Копіюємо Gradle wrapper і всі файли
