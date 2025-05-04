@@ -8,6 +8,10 @@ COPY common /home/gradle/project/common
 # Copy the api-gateway project
 COPY api-gateway /home/gradle/project/api-gateway
 
+# Debug: List files in common directory to verify Gradle Wrapper
+RUN ls -la /home/gradle/project/common
+RUN ls -la /home/gradle/project/common/gradle/wrapper
+
 # Ensure the Gradle wrapper in common is executable
 RUN chmod +x common/gradlew
 
