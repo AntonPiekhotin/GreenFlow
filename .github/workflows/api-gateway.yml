@@ -19,6 +19,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Make Gradle wrapper executable
+        run: chmod +x api-gateway/gradlew
+
       - name: Build with Gradle
         run: cd api-gateway && ./gradlew build
 
