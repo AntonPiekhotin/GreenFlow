@@ -20,6 +20,12 @@ jobs:
           java-version: '21'
           distribution: 'adopt'
 
+      - name: Grant execute permission for gradlew in common
+        run: chmod +x common/gradlew
+
+      - name: Run tests in common
+        run: cd common && ./gradlew test
+
       - name: Grant execute permission for gradlew in api-gateway
         run: chmod +x api-gateway/gradlew
 
