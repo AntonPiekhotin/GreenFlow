@@ -20,7 +20,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Make Gradle wrapper executable
-        run: chmod +x api-gateway/gradlew
+        run: chmod +x api-gateway/gradlew && chmod +x common/gradlew
 
       - name: Publish common to mavenLocal
         run: cd common && ./gradlew publishToMavenLocal
