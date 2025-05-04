@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - 'api-gateway/**'
+      - '.github/workflows/api-gateway.yml'
 
 jobs:
   build:
