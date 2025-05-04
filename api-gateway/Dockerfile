@@ -1,22 +1,25 @@
-# етап 1: збірка
+# Етап 1: Складання
 FROM gradle:8.6-jdk21 AS builder
 WORKDIR /home/gradle/project
 
-# Копіюємо Gradle wrapper і всі файли
+# Копіюємо весь проєкт (усі модулі)
 COPY . .
 
-# Переконайтеся, що gradlew є виконуваним
+# Переконуємося, що Gradle wrapper є виконуваним
 RUN chmod +x gradlew
 
-# Збираємо jar (без тестів, щоб було швидше)
-RUN ./gradlew clean build -x test
+# Публікуємо модуль common у mavenLocal
+RUN ./gradlew :common:publishToMavenLocal
 
-# етап 2: рантайм
+# Збираємо модуль api-gateway, пропускаючи тести
+RUN ./gradlew :api-gateway:clean :api-gateway:build -x test
+
+# Етап 2: Виконання
 FROM openjdk:21-jdk
 WORKDIR /app
 
-# Копіюємо зібраний jar з попереднього етапу
-COPY --from=builder /home/gradle/project/build/libs/*.jar ./app.jar
+# Копіюємо зібраний JAR з етапу builder
+COPY --from=builder /home/gradle/project/api-gateway/build/libs/*.jar ./app.jar
 
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
