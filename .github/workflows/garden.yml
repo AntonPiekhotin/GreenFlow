@@ -1,4 +1,4 @@
-name: API Gateway CI/CD
+name: Garden CI/CD
 
 on:
   push:
