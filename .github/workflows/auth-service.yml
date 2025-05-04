@@ -1,0 +1,47 @@
+name: Auth Service CI/CD
+
+on:
+  push:
+    paths:
+      - 'auth-service/**'
+      - 'common/**'
+      - '.github/workflows/auth-service.yml'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v2
+        with:
+          java-version: '21'
+          distribution: 'adopt'
+
+      - name: Grant execute permission for gradlew in common
+        run: chmod +x common/gradlew
+
+      - name: Test and publish common to mavenLocal
+        run: cd common && ./gradlew test publishToMavenLocal
+
+      - name: Grant execute permission for gradlew in auth-service
+        run: chmod +x auth-service/gradlew
+
+      - name: Run tests in auth-service
+        run: cd auth-service && ./gradlew test
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: .  # Use the root of the repository to include common and auth-service
+          file: ./auth-service/Dockerfile  # Path to the Dockerfile
+          push: true
+          tags: kartosha/greenflow.auth-service
