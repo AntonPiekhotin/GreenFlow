@@ -16,7 +16,7 @@ jobs:
         uses: actions/setup-java@v2
         with:
           java-version: '21'
-          distribution: 'corretto'
+          distribution: 'amazon-corretto'
 
       - name: Build with Gradle
         run: cd api-gateway && ./gradlew build
