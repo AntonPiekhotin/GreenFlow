@@ -22,6 +22,11 @@ jobs:
       - name: Make Gradle wrapper executable
         run: chmod +x api-gateway/gradlew
 
+      # Побудова і публікація common у mavenLocal
+      - name: Publish common to mavenLocal
+        working-directory: common
+        run: ../gradlew publishToMavenLocal
+
       - name: Build with Gradle
         run: cd api-gateway && ./gradlew build
 
