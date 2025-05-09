@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: config-map
+data:
+  JWT_SECRET: 'VPQ2O9dxgnnsvb238R5HPasvAEsdfgh9G8HTQW3wrfwg2vbsdeahgP8RFGHQW3UVEW08THW23W08GHDgnA9ThnsfjavG239048TY'
+  JWT_EXPIRATION: '86400000'
+
+  DB_USERNAME: postgres
+  DB_PASSWORD: postgres
+
+  RABBITMQ_HOST: localhost
+  RABBITMQ_PORT: '5672'
+  RABBITMQ_USERNAME: rmuser
+  RABBITMQ_PASSWORD: rmpassword
+
+  REDIS_HOST: localhost
+  REDIS_PORT: '6379'
+  REDIS_PASSWORD: redispassword
+
+  MONGO_HOST: localhost
+  MONGO_PORT: '27017'
+  MONGO_USERNAME: mongouser
+  MONGO_PASSWORD: mongopassword
+
+  WORKER_DB_HOST: localhost
+  AUTH_DB_HOST: localhost
+  EQUIPMENT_DB_HOST: localhost
+  CLIENT_DB_HOST: localhost
+  GARDEN_DB_HOST: localhost
+  ORDER_DB_HOST: localhost
