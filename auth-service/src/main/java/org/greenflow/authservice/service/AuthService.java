@@ -12,6 +12,7 @@ import org.greenflow.authservice.model.entity.role.Roles;
 import org.greenflow.authservice.output.persistent.UserRepository;
 import org.greenflow.common.model.dto.UserCreationDto;
 import org.greenflow.common.model.exception.GreenFlowException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -32,8 +33,15 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final RestTemplate restTemplate;
 
-    private static final String CLIENT_SERVICE_URL = "http://client/api/v1";
-    private static final String WORKER_SERVICE_URL = "http://worker/api/v1";
+    @Value("${host.client}")
+    private static String CLIENT_HOST;
+
+    @Value("${host.worker}")
+    private static String WORKER_HOST;
+
+    private static final String CLIENT_SERVICE_URL = "http://" + CLIENT_HOST + "/api/v1";
+
+    private static final String WORKER_SERVICE_URL = "http://" + WORKER_HOST + "/api/v1";
 
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);

@@ -5,6 +5,10 @@ jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION}
 
+host:
+  client: ${CLIENT_SERVICE_HOST}
+  worker: ${WORKER_SERVICE_HOST}
+
 spring:
   application:
     name: auth-service
@@ -27,11 +31,3 @@ spring:
             scope:
               - email
               - profile
-
-eureka:
-  instance:
-    prefer-ip-address: true
-    instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
-  client:
-    serviceUrl:
-      defaultZone: http://localhost:8761/eureka/
