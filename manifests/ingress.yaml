@@ -3,11 +3,11 @@ kind: Ingress
 metadata:
   name: api-gateway-ingress
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    kubernetes.io/ingress.class: "nginx"
 spec:
   ingressClassName: nginx
   rules:
-    - host: api.greenflow.com
+    - host: greenflow.software
       http:
         paths:
           - path: /
