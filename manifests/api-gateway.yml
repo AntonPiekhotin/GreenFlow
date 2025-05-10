@@ -15,12 +15,12 @@ spec:
       containers:
         - name: api-gateway
           image: kartosha/greenflow.api-gateway:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           envFrom:
             - configMapRef:
                 name: config-map
-
 ---
 apiVersion: v1
 kind: Service

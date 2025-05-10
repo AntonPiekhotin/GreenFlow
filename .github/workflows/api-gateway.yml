@@ -8,7 +8,7 @@ on:
       - '.github/workflows/api-gateway.yml'
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -44,4 +44,19 @@ jobs:
           context: .  # Use the root of the repository to include common and api-gateway
           file: ./api-gateway/Dockerfile  # Path to the Dockerfile
           push: true
-          tags: kartosha/greenflow.api-gateway
+          tags: |
+            kartosha/greenflow.api-gateway:latest
+            kartosha/greenflow.api-gateway:${{ github.sha }}
+
+      - name: Set up Kubeconfig
+        env:
+          KUBECONFIG_DATA: ${{ secrets.KUBECONFIG }}
+        run: |
+          mkdir -p ~/.kube
+          echo "$KUBECONFIG_DATA" > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl set image deployment/api-gateway api-gateway=kartosha/greenflow.api-gateway:${{ github.sha }}
+          kubectl rollout status deployment/api-gateway
