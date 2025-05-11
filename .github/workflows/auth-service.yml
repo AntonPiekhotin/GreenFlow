@@ -44,4 +44,19 @@ jobs:
           context: .  # Use the root of the repository to include common and auth-service
           file: ./auth-service/Dockerfile  # Path to the Dockerfile
           push: true
-          tags: kartosha/greenflow.auth-service
+          tags: |
+            kartosha/greenflow.auth-service:latest
+            kartosha/greenflow.auth-service:${{ github.sha }}
+
+      - name: Set up Kubeconfig
+        env:
+          KUBECONFIG_DATA: ${{ secrets.KUBECONFIG }}
+        run: |
+          mkdir -p ~/.kube
+          echo "$KUBECONFIG_DATA" > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl set image deployment/api-gateway api-gateway=kartosha/greenflow.api-gateway:${{ github.sha }}
+          kubectl rollout status deployment/api-gateway
