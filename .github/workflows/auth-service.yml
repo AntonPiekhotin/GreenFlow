@@ -8,7 +8,7 @@ on:
       - '.github/workflows/auth-service.yml'
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -58,5 +58,5 @@ jobs:
 
       - name: Deploy to Kubernetes
         run: |
-          kubectl set image deployment/api-gateway api-gateway=kartosha/greenflow.api-gateway:${{ github.sha }}
-          kubectl rollout status deployment/api-gateway
+          kubectl set image deployment/auth-service auth-service=kartosha/greenflow.auth-service:${{ github.sha }}
+          kubectl rollout status deployment/auth-service
