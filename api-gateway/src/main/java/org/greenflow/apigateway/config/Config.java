@@ -50,9 +50,7 @@ public class Config {
         System.out.println("Auth Service Host: " + AUTH_SERVICE_HOST);
         System.out.println("Auth Service Port: " + AUTH_SERVICE_PORT);
         return builder.routes()
-                .route("auth-service", r -> r.path("/api/v1/auth/register")
-                        .uri("http://" + AUTH_SERVICE_HOST + ":" + AUTH_SERVICE_PORT))
-                .route("auth-service", r -> r.path("/api/v1/auth/login")
+                .route("auth-service", r -> r.path("/api/v1/auth/**")
                         .uri("http://" + AUTH_SERVICE_HOST + ":" + AUTH_SERVICE_PORT))
                 .route("client", r -> r.path("/api/v1/client/**")
                         .filters(f -> f.filter(filter))
