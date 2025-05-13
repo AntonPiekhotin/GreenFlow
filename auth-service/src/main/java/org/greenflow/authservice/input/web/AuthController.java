@@ -10,6 +10,7 @@ import org.greenflow.authservice.service.AuthService;
 import org.greenflow.authservice.service.security.JwtService;
 import org.greenflow.common.model.dto.ResponseErrorDto;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -25,6 +26,11 @@ public class AuthController {
     private final JwtService jwtService;
 
     private final AuthService authService;
+
+    @GetMapping("/test")
+    public ResponseEntity<?> test() {
+        return ResponseEntity.ok("Auth service is up and running!");
+    }
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody LoginRequest loginRequest) {
