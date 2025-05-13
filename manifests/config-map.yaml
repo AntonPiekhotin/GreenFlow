@@ -23,9 +23,9 @@ data:
   MONGO_USERNAME: mongouser
   MONGO_PASSWORD: mongopassword
 
-  WORKER_DB_HOST: localhost
-  AUTH_DB_HOST: localhost
-  EQUIPMENT_DB_HOST: localhost
-  CLIENT_DB_HOST: localhost
-  GARDEN_DB_HOST: localhost
-  ORDER_DB_HOST: localhost
+  WORKER_DB_HOST: worker-db
+  AUTH_DB_HOST: auth-db
+  EQUIPMENT_DB_HOST: equipment-db
+  CLIENT_DB_HOST: client-db
+  GARDEN_DB_HOST: garden-db
+  ORDER_DB_HOST: order-db
