@@ -50,3 +50,15 @@ spec:
         - name: postgres-data
           persistentVolumeClaim:
             claimName: auth-db-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: auth-db
+spec:
+  selector:
+    app: auth-db
+  ports:
+    - protocol: TCP
+      port: 5432
+      targetPort: 5432
