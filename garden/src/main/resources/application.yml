@@ -1,5 +1,5 @@
 server:
-  port: 0
+  port: ${GARDEN_SERVICE_PORT}
 
 spring:
   application:
