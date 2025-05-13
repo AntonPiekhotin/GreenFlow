@@ -2,6 +2,7 @@ package org.greenflow.authservice.input.web;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.greenflow.authservice.model.dto.LoginRequest;
 import org.greenflow.authservice.model.dto.LoginResponse;
 import org.greenflow.authservice.model.dto.SignupRequest;
@@ -21,6 +22,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
 
     private final JwtService jwtService;
@@ -45,6 +47,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody SignupRequest signUpRequest) {
+        log.debug("Registering user: {}", signUpRequest);
         if (authService.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity.badRequest().body(ResponseErrorDto.builder()
                     .statusCode(400)

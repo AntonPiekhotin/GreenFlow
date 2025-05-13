@@ -48,11 +48,13 @@ public class AuthService {
     }
 
     public boolean existsByEmail(String email) {
+        log.debug("Checking if email exists: {}", email);
         return userRepository.existsByEmail(email);
     }
 
     @Transactional
     public User registerUser(@Valid SignupRequest signUpRequest) {
+        log.debug("Registering user: {}", signUpRequest);
         if (signUpRequest.getRole().equals("CLIENT")) {
             return registerClient(signUpRequest);
         } else if (signUpRequest.getRole().equals("WORKER")) {

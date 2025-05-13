@@ -3,6 +3,7 @@ package org.greenflow.authservice.service.security;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.greenflow.authservice.model.entity.User;
 import org.greenflow.authservice.model.entity.role.Role;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,6 +18,7 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 @Component
+@Slf4j
 public class JwtService {
 
     @Value("${jwt.secret}")
@@ -30,6 +32,7 @@ public class JwtService {
     }
 
     public String generateToken(User user) {
+        log.debug("Generating token for user: {}", user);
         String roles = user.getRoles().stream()
                 .map(Role::getAuthority)
                 .collect(Collectors.joining(","));
