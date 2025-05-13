@@ -47,7 +47,7 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody SignupRequest signUpRequest) {
-        log.debug("Registering user: {}", signUpRequest);
+        log.info("Registering user: {}", signUpRequest);
         if (authService.existsByEmail(signUpRequest.getEmail())) {
             return ResponseEntity.badRequest().body(ResponseErrorDto.builder()
                     .statusCode(400)
