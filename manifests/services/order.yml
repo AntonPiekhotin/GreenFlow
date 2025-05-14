@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: order
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: order
+  template:
+    metadata:
+      labels:
+        app: order
+    spec:
+      containers:
+        - name: order
+          image: kartosha/greenflow.order:latest
+          resources:
+            requests:
+              cpu: 200m
+              memory: 300Mi
+            limits:
+              cpu: 300m
+              memory: 400Mi
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8085
+          envFrom:
+            - configMapRef:
+                name: config-map
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: order
+spec:
+  type: ClusterIP
+  selector:
+    app: order
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8085

@@ -8,7 +8,7 @@ on:
       - '.github/workflows/order.yml'
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -44,4 +44,19 @@ jobs:
           context: .  # Use the root of the repository to include common and order
           file: ./order/Dockerfile  # Path to the Dockerfile
           push: true
-          tags: kartosha/greenflow.order
+          tags: |
+            kartosha/greenflow.order:latest
+            kartosha/greenflow.order:${{ github.sha }}
+
+      - name: Set up Kubeconfig
+        env:
+          KUBECONFIG_DATA: ${{ secrets.KUBECONFIG }}
+        run: |
+          mkdir -p ~/.kube
+          echo "$KUBECONFIG_DATA" > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl set image deployment/order order=kartosha/greenflow.order:${{ github.sha }}
+          kubectl rollout status deployment/order
