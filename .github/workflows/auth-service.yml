@@ -41,8 +41,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
-          context: .  # Use the root of the repository to include common and auth-service
-          file: ./auth-service/Dockerfile  # Path to the Dockerfile
+          context: .
+          file: ./auth-service/Dockerfile
           push: true
           tags: |
             kartosha/greenflow.auth-service:latest
