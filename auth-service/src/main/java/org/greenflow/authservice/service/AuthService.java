@@ -1,5 +1,6 @@
 package org.greenflow.authservice.service;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -39,9 +40,14 @@ public class AuthService {
     @Value("${host.worker}")
     private String WORKER_HOST;
 
-    private final String CLIENT_SERVICE_URL = "http://" + CLIENT_HOST + "/api/v1";
+    private String CLIENT_SERVICE_URL;
+    private String WORKER_SERVICE_URL;
 
-    private final String WORKER_SERVICE_URL = "http://" + WORKER_HOST + "/api/v1";
+    @PostConstruct
+    public void init() {
+        CLIENT_SERVICE_URL = "http://" + CLIENT_HOST + "/api/v1";
+        WORKER_SERVICE_URL = "http://" + WORKER_HOST + "/api/v1";
+    }
 
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
