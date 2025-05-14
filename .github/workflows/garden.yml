@@ -44,4 +44,19 @@ jobs:
           context: .  # Use the root of the repository to include common and garden
           file: ./garden/Dockerfile  # Path to the Dockerfile
           push: true
-          tags: kartosha/greenflow.garden
+          tags: |
+            kartosha/greenflow.garden:latest
+            kartosha/greenflow.garden:${{ github.sha }}
+
+      - name: Set up Kubeconfig
+        env:
+          KUBECONFIG_DATA: ${{ secrets.KUBECONFIG }}
+        run: |
+          mkdir -p ~/.kube
+          echo "$KUBECONFIG_DATA" > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl set image deployment/garden garden=kartosha/greenflow.garden:${{ github.sha }}
+          kubectl rollout status deployment/garden
