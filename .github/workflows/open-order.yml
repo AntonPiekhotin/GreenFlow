@@ -45,8 +45,8 @@ jobs:
           file: ./open-order/Dockerfile  # Path to the Dockerfile
           push: true
           tags: |
-            kartosha/greenflow.worker:latest
-            kartosha/greenflow.worker:${{ github.sha }}      
+            kartosha/greenflow.open-order:latest
+            kartosha/greenflow.open-order:${{ github.sha }}      
 
       - name: Set up Kubeconfig
         env:
@@ -58,5 +58,5 @@ jobs:
 
       - name: Deploy to Kubernetes
         run: |
-          kubectl set image deployment/worker worker=kartosha/greenflow.worker:${{ github.sha }}
-          kubectl rollout status deployment/worker
+          kubectl set image deployment/open-order open-order=kartosha/greenflow.open-order:${{ github.sha }}
+          kubectl rollout status deployment/open-order
