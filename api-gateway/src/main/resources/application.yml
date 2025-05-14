@@ -4,25 +4,18 @@ server:
 service:
   auth:
     host: ${AUTH_SERVICE_HOST}
-    port: ${AUTH_SERVICE_PORT}
   client:
     host: ${CLIENT_SERVICE_HOST}
-    port: ${CLIENT_SERVICE_PORT}
   equipment:
     host: ${EQUIPMENT_SERVICE_HOST}
-    port: ${EQUIPMENT_SERVICE_PORT}
   garden:
     host: ${GARDEN_SERVICE_HOST}
-    port: ${GARDEN_SERVICE_PORT}
   openOrder:
     host: ${OPEN_ORDER_SERVICE_HOST}
-    port: ${OPEN_ORDER_SERVICE_PORT}
   order:
     host: ${ORDER_SERVICE_HOST}
-    port: ${ORDER_SERVICE_PORT}
   worker:
     host: ${WORKER_SERVICE_HOST}
-    port: ${WORKER_SERVICE_PORT}
 
 
 jwt:

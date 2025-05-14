@@ -16,40 +16,27 @@ public class Config {
 
     @Value("${service.auth.host}")
     private String AUTH_SERVICE_HOST;
-    @Value("${service.auth.port}")
-    private String AUTH_SERVICE_PORT;
 
     @Value("${service.client.host}")
     private String CLIENT_SERVICE_HOST;
-    @Value("${service.client.port}")
-    private String CLIENT_SERVICE_PORT;
 
     @Value("${service.worker.host}")
     private String WORKER_SERVICE_HOST;
-    @Value("${service.worker.port}")
-    private String WORKER_SERVICE_PORT;
 
     @Value("${service.garden.host}")
     private String GARDEN_SERVICE_HOST;
-    @Value("${service.garden.port}")
-    private String GARDEN_SERVICE_PORT;
 
     @Value("${service.order.host}")
     private String ORDER_SERVICE_HOST;
-    @Value("${service.order.port}")
-    private String ORDER_SERVICE_PORT;
 
     @Value("${service.open-order.host}")
     private String OPEN_ORDER_SERVICE_HOST;
-    @Value("${service.open-order.port}")
-    private String OPEN_ORDER_SERVICE_PORT;
-
 
     @Bean
     public RouteLocator routes(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("auth-service", r -> r.path("/api/v1/auth/**")
-                        .uri("http://" + AUTH_SERVICE_HOST + ":" + AUTH_SERVICE_PORT))
+                        .uri("http://" + AUTH_SERVICE_HOST))
                 .route("client", r -> r.path("/api/v1/client/**")
                         .filters(f -> f.filter(filter))
                         .uri("lb://client"))
