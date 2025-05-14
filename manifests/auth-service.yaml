@@ -24,7 +24,7 @@ spec:
               memory: 400Mi
           imagePullPolicy: Always
           ports:
-            - containerPort: 8080
+            - containerPort: 8081
           envFrom:
             - configMapRef:
                 name: config-map
@@ -40,4 +40,4 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 8080
+      targetPort: 8081
