@@ -38,3 +38,4 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.greenflow.authservice: DEBUG
+    root: debug
