@@ -45,6 +45,7 @@ public class OpenOrderService {
      * @param order The order to be saved, represented as an OrderOpeningMessageDto.
      */
     public void saveOpenOrder(OrderOpeningMessageDto order) {
+        log.debug("Saving open order id: {}", order.getOrderId());
         // Add the order's geospatial data (latitude and longitude) to Redis.
         redisTemplate.opsForGeo()
                 .add(GEO_KEY, new Point(order.getLongitude(), order.getLatitude()), order.getOrderId());

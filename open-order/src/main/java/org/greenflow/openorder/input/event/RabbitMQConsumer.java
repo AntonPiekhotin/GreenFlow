@@ -18,11 +18,13 @@ public class RabbitMQConsumer {
 
     @RabbitListener(queues = RabbitMQConstants.ORDER_OPENING_QUEUE)
     public void consumeOrderOpeningMessage(OrderOpeningMessageDto order) {
+        log.info("Received order opening message: {}", order);
         openOrderService.saveOpenOrder(order);
     }
 
     @RabbitListener(queues = RabbitMQConstants.ORDER_DELETION_QUEUE)
     public void consumeOrderDeletionMessage(OrderDeletionMessageDto order) {
+        log.info("Received order deletion message: {}", order);
         openOrderService.deleteOpenOrder(order);
     }
 }
