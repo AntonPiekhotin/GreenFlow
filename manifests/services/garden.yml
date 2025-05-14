@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: client
+  name: garden
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: client
+      app: garden
   template:
     metadata:
       labels:
-        app: client
+        app: garden
     spec:
       containers:
-        - name: client
-          image: kartosha/greenflow.client:latest
+        - name: garden
+          image: kartosha/greenflow.garden:latest
           resources:
             requests:
               cpu: 200m
@@ -32,11 +32,11 @@ spec:
 apiVersion: v1
 kind: Service
 metadata:
-  name: client
+  name: garden
 spec:
   type: ClusterIP
   selector:
-    app: client
+    app: garden
   ports:
     - protocol: TCP
       port: 80
