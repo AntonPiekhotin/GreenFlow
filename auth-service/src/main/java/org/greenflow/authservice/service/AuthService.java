@@ -34,14 +34,14 @@ public class AuthService {
     private final RestTemplate restTemplate;
 
     @Value("${host.client}")
-    private static String CLIENT_HOST;
+    private String CLIENT_HOST;
 
     @Value("${host.worker}")
-    private static String WORKER_HOST;
+    private String WORKER_HOST;
 
-    private static final String CLIENT_SERVICE_URL = "http://" + CLIENT_HOST + "/api/v1";
+    private final String CLIENT_SERVICE_URL = "http://" + CLIENT_HOST + "/api/v1";
 
-    private static final String WORKER_SERVICE_URL = "http://" + WORKER_HOST + "/api/v1";
+    private final String WORKER_SERVICE_URL = "http://" + WORKER_HOST + "/api/v1";
 
     public Optional<User> findByEmail(String email) {
         return userRepository.findByEmail(email);
