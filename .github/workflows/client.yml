@@ -45,8 +45,8 @@ jobs:
           file: ./client/Dockerfile
           push: true
           tags: |
-            kartosha/greenflow.auth-service:latest
-            kartosha/greenflow.auth-service:${{ github.sha }}
+            kartosha/greenflow.client:latest
+            kartosha/greenflow.client:${{ github.sha }}
 
       - name: Set up Kubeconfig
         env:
@@ -58,5 +58,5 @@ jobs:
 
       - name: Deploy to Kubernetes
         run: |
-          kubectl set image deployment/auth-service auth-service=kartosha/greenflow.auth-service:${{ github.sha }}
-          kubectl rollout status deployment/auth-service
+          kubectl set image deployment/client client=kartosha/greenflow.client:${{ github.sha }}
+          kubectl rollout status deployment/client
