@@ -49,7 +49,7 @@ public class Config {
     public RouteLocator routes(RouteLocatorBuilder builder) {
         return builder.routes()
                 .route("auth-service", r -> r.path("/api/v1/auth/**")
-                        .uri("http://" + AUTH_SERVICE_HOST))
+                        .uri("http://" + AUTH_SERVICE_HOST + ":" + AUTH_SERVICE_PORT))
                 .route("client", r -> r.path("/api/v1/client/**")
                         .filters(f -> f.filter(filter))
                         .uri("lb://client"))
