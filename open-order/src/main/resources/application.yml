@@ -1,5 +1,5 @@
 server:
-  port: ${OPEN_ORDER_SERVICE_PORT}
+  port: 8086
 
 spring:
   application:

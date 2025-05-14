@@ -31,15 +31,9 @@ data:
   ORDER_DB_HOST: order-db
 
   AUTH_SERVICE_HOST: auth-service
-
   CLIENT_SERVICE_HOST: client
-
   EQUIPMENT_SERVICE_HOST: equipment
-
   GARDEN_SERVICE_HOST: garden
-
   OPEN_ORDER_SERVICE_HOST: open-order
-
   ORDER_SERVICE_HOST: order
-
   WORKER_SERVICE_HOST: worker
