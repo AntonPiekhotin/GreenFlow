@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: notification
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: pehotin.anton@gmail.com
+    password: "qpqb vwpl yija vrow"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
+logging:
+  level:
+    org.greenflow: debug
