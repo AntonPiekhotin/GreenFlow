@@ -21,6 +21,8 @@ public class OrderOpeningMessageDto implements Serializable {
     private static final long serialVersionUID = 1131332095712355123L;
 
     String orderId;
+    String clientId;
+    String clientEmail;
 
     double longitude;
     double latitude;

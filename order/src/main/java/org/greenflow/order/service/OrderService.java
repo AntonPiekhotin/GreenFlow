@@ -15,9 +15,11 @@ import org.greenflow.order.output.event.RabbitMQProducer;
 import org.greenflow.order.output.persistent.OrderRepository;
 import org.greenflow.order.service.mapper.OrderMapper;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -30,13 +32,14 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final RabbitMQProducer rabbitMQProducer;
 
-    public Order createOrder(@NotBlank String clientId, @Valid @NotNull OrderCreationDto orderDto) {
+    public Order createOrder(@NotBlank String clientId, @NotBlank String clientEmail,
+                             @Valid @NotNull OrderCreationDto orderDto) {
         Order order = OrderMapper.INSTANCE.toEntity(orderDto);
         order.setClientId(clientId);
         order.setStatus(OrderStatus.CREATED);
         order = orderRepository.save(order);
 
-        rabbitMQProducer.sendOrderOpeningMessage(order);
+        rabbitMQProducer.sendOrderOpeningMessage(order, clientEmail);
 
         order.setStatus(OrderStatus.OPEN);
         order = orderRepository.save(order);

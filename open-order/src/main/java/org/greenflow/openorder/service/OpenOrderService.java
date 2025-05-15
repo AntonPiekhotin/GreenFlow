@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.greenflow.common.model.dto.EmailNotificationDto;
 import org.greenflow.common.model.dto.event.OrderAssignedMessageDto;
 import org.greenflow.common.model.dto.event.OrderDeletionMessageDto;
 import org.greenflow.common.model.dto.event.OrderOpeningMessageDto;
@@ -150,6 +151,7 @@ public class OpenOrderService {
             rabbitMQProducer.sendOrderAssignedMessage(orderAssignedMessage);
             deleteOpenOrderFromRedis(orderId);
             log.info("Order with ID {} assigned to worker {}", orderId, workerId);
+            sendEmailToClient(foundOrder);
         } catch (Exception e) {
             log.error("Failed to assign order with ID {} to worker {}", orderId, workerId, e);
             throw new GreenFlowException(500, "Failed to assign order", e);
@@ -170,5 +172,22 @@ public class OpenOrderService {
                 })
                 .filter(Objects::nonNull)
                 .toList();
+    }
+
+    private void sendEmailToClient(String orderString) {
+        try {
+            log.debug("Sending email to client: {}", orderString);
+            OrderOpeningMessageDto order = objectMapper.readValue(orderString, OrderOpeningMessageDto.class);
+            rabbitMQProducer.sendEmailMessage(EmailNotificationDto.builder()
+                            .to(order.getClientEmail())
+                            .subject("Order Assigned")
+                            .text("Your order with ID " + order.getOrderId() + " has been assigned to a worker.")
+                    .build());
+            log.info("Email sent to client {} for order {}", order.getClientEmail(), order.getOrderId());
+        } catch (JsonProcessingException e) {
+            log.error("Failed to deserialize order string: {}", orderString, e);
+            throw new RuntimeException(e);
+        }
+
     }
 }

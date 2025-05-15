@@ -21,13 +21,15 @@ public class RabbitMQProducer {
     public static final String FAILED_TO_SEND_MESSAGE_TO_RABBIT_MQ = "Failed to send message to RabbitMQ";
     private final RabbitTemplate rabbitTemplate;
 
-    public void sendOrderOpeningMessage(Order order) {
+    public void sendOrderOpeningMessage(Order order, String clientEmail) {
         if (!LocalDateTime.now().isAfter(order.getStartDate().atStartOfDay())) {
             return;
         }
         try {
             var orderOpeningMessage = OrderOpeningMessageDto.builder()
                     .orderId(order.getId())
+                    .clientId(order.getClientId())
+                    .clientEmail(clientEmail)
                     .longitude(order.getLongitude())
                     .latitude(order.getLatitude())
                     .description(order.getDescription())

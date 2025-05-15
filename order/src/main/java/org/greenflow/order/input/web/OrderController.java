@@ -33,8 +33,9 @@ public class OrderController {
     @PostMapping
     @PreAuthorize("hasAuthority('CLIENT')")
     public ResponseEntity<?> createOrder(@RequestHeader(CustomHeaders.X_USER_ID) String clientId,
+                                         @RequestHeader(CustomHeaders.X_EMAIL) String clientEmail,
                                          @RequestBody @NotNull @Valid OrderCreationDto orderDto) {
-        return ResponseEntity.status(201).body(orderService.createOrder(clientId, orderDto));
+        return ResponseEntity.status(201).body(orderService.createOrder(clientId, clientEmail, orderDto));
     }
 
     @GetMapping("/my")
