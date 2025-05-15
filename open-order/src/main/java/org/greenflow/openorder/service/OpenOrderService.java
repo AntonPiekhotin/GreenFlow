@@ -21,6 +21,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
@@ -153,5 +154,21 @@ public class OpenOrderService {
             log.error("Failed to assign order with ID {} to worker {}", orderId, workerId, e);
             throw new GreenFlowException(500, "Failed to assign order", e);
         }
+    }
+
+    public Collection<OpenOrderDto> getAllOpenOrders() {
+        log.debug("Retrieving all open orders from Redis");
+        return redisTemplate.keys(HASH_KEY_PREFIX + "*").stream()
+                .map(key -> {
+                    String orderJson = redisTemplate.opsForValue().get(key);
+                    try {
+                        return objectMapper.readValue(orderJson, OpenOrderDto.class);
+                    } catch (JsonProcessingException e) {
+                        log.error("Failed to deserialize order with key: {}", key, e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .toList();
     }
 }

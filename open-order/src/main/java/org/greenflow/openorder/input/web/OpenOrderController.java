@@ -41,5 +41,15 @@ public class OpenOrderController {
         openOrderService.assignOrderToWorker(orderId, workerId);
         return ResponseEntity.ok("Order assigned successfully");
     }
+    
+    @GetMapping("/all")
+    @PreAuthorize("hasAuthority('ADMIN')")
+    public ResponseEntity<?> getAllOpenOrders() {
+        var openOrders = openOrderService.getAllOpenOrders();
+        if (openOrders.isEmpty()) {
+            return ResponseEntity.status(404).body(List.of());
+        }
+        return ResponseEntity.ok(openOrders);
+    }
 
 }
