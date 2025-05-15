@@ -15,6 +15,8 @@ import lombok.experimental.FieldDefaults;
 public class OpenOrderDto {
 
     String orderId;
+    String clientId;
+    String clientEmail;
 
     double longitude;
     double latitude;
