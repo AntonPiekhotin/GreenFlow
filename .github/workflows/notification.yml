@@ -8,7 +8,7 @@ on:
       - '.github/workflows/notification.yml'
 
 jobs:
-  build:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -44,4 +44,19 @@ jobs:
           context: .  # Use the root of the repository to include common and notification
           file: ./notification/Dockerfile  # Path to the Dockerfile
           push: true
-          tags: kartosha/greenflow.notification
+          tags: |
+            kartosha/greenflow.notification:latest
+            kartosha/greenflow.notification:${{ github.sha }}
+
+      - name: Set up Kubeconfig
+        env:
+          KUBECONFIG_DATA: ${{ secrets.KUBECONFIG }}
+        run: |
+          mkdir -p ~/.kube
+          echo "$KUBECONFIG_DATA" > ~/.kube/config
+          chmod 600 ~/.kube/config
+
+      - name: Deploy to Kubernetes
+        run: |
+          kubectl set image deployment/notification notification=kartosha/greenflow.notification:${{ github.sha }}
+          kubectl rollout status deployment/notification
