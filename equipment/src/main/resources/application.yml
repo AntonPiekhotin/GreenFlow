@@ -1,5 +1,5 @@
 server:
-  port: ${EQUIPMENT_SERVICE_PORT}
+  port: 8087
 
 spring:
   application:
