@@ -10,12 +10,17 @@ spring:
     port: 587
     username: pehotin.anton@gmail.com
     password: "qpqb vwpl yija vrow"
+    protocol: smtp
     properties:
       mail:
         smtp:
           auth: true
           starttls:
             enable: true
+            required: true
+          ssl:
+            trust: smtp.gmail.com
+        debug: true
 
   rabbitmq:
     host: ${RABBITMQ_HOST}
