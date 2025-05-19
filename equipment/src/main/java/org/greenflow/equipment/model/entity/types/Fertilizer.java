@@ -19,8 +19,6 @@ import org.springframework.data.annotation.TypeAlias;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Fertilizer extends Equipment {
 
-    String type;
-
     String brand;
 
     String model;
@@ -32,8 +30,6 @@ public class Fertilizer extends Equipment {
     Double weight;
 
     String color;
-
-    String applicationMethod;
 
     Boolean organic;
 

@@ -7,11 +7,9 @@ spring:
 
   data:
     mongodb:
-      uri: mongodb://${MONGO_HOST}:${MONGO_PORT}/equipment
-      database: equipment-db
-      username: ${MONGO_USERNAME}
-      password: ${MONGO_PASSWORD}
+      uri: mongodb://${MONGO_HOST}:${MONGO_PORT}/equipment-db
+      authentication-database: admin
 
 logging:
   level:
-    greenflow: DEBUG
+    org.greenflow: debug

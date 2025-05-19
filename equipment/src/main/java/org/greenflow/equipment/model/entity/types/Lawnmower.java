@@ -19,8 +19,6 @@ import org.springframework.data.annotation.TypeAlias;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class Lawnmower extends Equipment {
 
-    String type;
-
     String brand;
 
     String model;
