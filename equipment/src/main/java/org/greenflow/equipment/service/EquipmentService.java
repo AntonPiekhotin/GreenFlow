@@ -37,16 +37,17 @@ public class EquipmentService {
         }
         return equipmentRepository.findAllByWarehouseId(warehouseId);
     }
-//
-//    public Equipment updateEquipment(String id, Equipment equipment) {
-//        if (!equipmentRepository.existsById(id)) {
-//            throw new GreenFlowException(400, "Equipment with id " + id + " does not exist");
-//        }
-//        Equipment updatedEquipment = equipmentRepository.findById(id)
-//                .orElseThrow(() -> new GreenFlowException(400, "Equipment with id " + id + " does not exist"));
-//
-//
-//    }
+
+    public Equipment updateEquipment(String id, Equipment equipment) {
+        Equipment existingEquipment = equipmentRepository.findById(id)
+                .orElseThrow(() -> new GreenFlowException(400, "Equipment with id " + id + " does not exist"));
+        equipment.setId(id);
+        equipment.setWarehouse(warehouseRepository.findById(existingEquipment.getWarehouse().getId())
+                .orElseThrow( () ->  new GreenFlowException(400,
+                        "Warehouse with id " + existingEquipment.getWarehouse().getId() + " does not exist"))
+        );
+        return equipmentRepository.save(equipment);
+    }
 
     public void deleteEquipmentById(@NotBlank String id) {
         if (!equipmentRepository.existsById(id)) {

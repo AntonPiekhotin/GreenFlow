@@ -35,7 +35,7 @@ public abstract class Equipment {
     @Id
     String id;
 
-    @DBRef
+    @DocumentReference(lazy = false)
     Warehouse warehouse;
 
     String name;
