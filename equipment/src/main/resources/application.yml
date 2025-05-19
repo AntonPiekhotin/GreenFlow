@@ -10,6 +10,14 @@ spring:
       uri: mongodb://${MONGO_HOST}:${MONGO_PORT}/equipment-db
       authentication-database: admin
 
+  datasource:
+    url: jdbc:postgresql://${LEASING_DB_HOST}:5438/leasing-db
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: create-drop
+
 logging:
   level:
     org.greenflow: debug
