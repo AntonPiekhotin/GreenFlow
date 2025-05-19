@@ -1,6 +1,8 @@
 package org.greenflow.equipment.service;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.greenflow.common.model.exception.GreenFlowException;
@@ -19,19 +21,19 @@ public class WarehouseService {
 
     private final WarehouseRepository warehouseRepository;
 
-    public WarehouseDto createWarehouse(@Valid WarehouseCreationDto warehouseCreationDto) {
+    public WarehouseDto createWarehouse(@NotNull @Valid WarehouseCreationDto warehouseCreationDto) {
         Warehouse warehouse = WarehouseMapper.INSTANCE.toEntity(warehouseCreationDto);
         warehouse = warehouseRepository.save(warehouse);
         return WarehouseMapper.INSTANCE.toDto(warehouse);
     }
 
-    public WarehouseDto getWarehouseById(String id) {
+    public WarehouseDto getWarehouse(@NotBlank String id) {
         Warehouse warehouse = warehouseRepository.findById(id)
                 .orElseThrow(() -> new GreenFlowException(400, "Warehouse with id " + id + " does not exist"));
         return WarehouseMapper.INSTANCE.toDto(warehouse);
     }
 
-    public WarehouseDto updateWarehouse(String id, WarehouseUpdateDto warehouseUpdateDto) {
+    public WarehouseDto updateWarehouse(@NotBlank String id, @NotNull @Valid WarehouseUpdateDto warehouseUpdateDto) {
         if (!warehouseRepository.existsById(id)) {
             throw new GreenFlowException(400, "Warehouse with id " + id + " does not exist");
         }
@@ -40,17 +42,11 @@ public class WarehouseService {
         return WarehouseMapper.INSTANCE.toDto(warehouseRepository.save(updatedWarehouse));
     }
 
-    public void deleteWarehouseById(String id) {
+    public void deleteWarehouseById(@NotBlank String id) {
         if (!warehouseRepository.existsById(id)) {
             throw new GreenFlowException(400, "Warehouse with id " + id + " does not exist");
         }
         warehouseRepository.deleteById(id);
     }
 
-
-    public WarehouseDto getWarehouse(String id) {
-        Warehouse warehouse = warehouseRepository.findById(id)
-                .orElseThrow(() -> new GreenFlowException(400, "Warehouse with id " + id + " does not exist"));
-        return WarehouseMapper.INSTANCE.toDto(warehouse);
-    }
 }
