@@ -4,7 +4,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.greenflow.common.model.constant.CustomHeaders;
-import org.greenflow.equipment.model.entity.Equipment;
 import org.greenflow.equipment.model.entity.EquipmentLease;
 import org.greenflow.equipment.service.LeasingService;
 import org.springframework.http.ResponseEntity;
