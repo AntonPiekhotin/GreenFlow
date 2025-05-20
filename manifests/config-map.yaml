@@ -29,6 +29,7 @@ data:
   CLIENT_DB_HOST: client-db
   GARDEN_DB_HOST: garden-db
   ORDER_DB_HOST: order-db
+  LEASING_DB_HOST: leasing-db
 
   AUTH_SERVICE_HOST: auth-service
   CLIENT_SERVICE_HOST: client
