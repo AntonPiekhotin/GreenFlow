@@ -3,6 +3,7 @@ package org.greenflow.equipment.model.entity;
 
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
@@ -23,7 +24,7 @@ import java.math.BigDecimal;
 
 @Document(collection = "equipment")
 @Getter
-@Setter(onParam_ = @NonNull)
+@Setter
 @SuperBuilder
 @AllArgsConstructor
 @NoArgsConstructor

@@ -11,7 +11,6 @@ import org.greenflow.equipment.model.entity.EquipmentLease;
 import org.greenflow.equipment.output.persistent.EquipmentLeaseRepository;
 import org.greenflow.equipment.output.persistent.EquipmentRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,6 +24,7 @@ public class LeasingService {
     private final EquipmentLeaseRepository equipmentLeaseRepository;
 
     public EquipmentLease requestLeaseEquipment(@NotBlank String equipmentId, @NotBlank String lesseeId) {
+        log.debug("request lease equipment {} from worker {}", equipmentId, lesseeId);
         Equipment equipment = equipmentRepository.findById(equipmentId)
                 .orElseThrow(() -> new GreenFlowException(400, "Equipment not found"));
         if (equipment.getStatus() != null &&
@@ -40,13 +40,15 @@ public class LeasingService {
                 .status(LeasingStatus.PENDING)
                 .build();
         equipmentLeaseRepository.save(lease);
+        log.info("Lease request created with id {} for worker {}", lease.getId(), lease.getLesseeId());
 
         equipment.setStatus(LeasingStatus.PENDING);
         equipment.setLeasedBy(lesseeId);
         equipmentRepository.save(equipment);
+        log.info("Equipment {} is now pending for lease", equipmentId);
         return lease;
     }
-    
+
     public List<EquipmentLease> getLeasedEquipment(@NotBlank String lesseeId) {
         return equipmentLeaseRepository.findAllByLesseeId(lesseeId);
     }
@@ -54,8 +56,32 @@ public class LeasingService {
     public EquipmentLease approveLease(@NotNull Long leaseId) {
         EquipmentLease lease = equipmentLeaseRepository.findById(leaseId)
                 .orElseThrow(() -> new GreenFlowException(400, "Lease not found"));
+        if (lease.getStatus() != LeasingStatus.PENDING) {
+            throw new GreenFlowException(400, "Lease is not pending");
+        }
         lease.setStatus(LeasingStatus.ACTIVE);
         lease.setStartDate(LocalDateTime.now());
+        log.info("Lease {} approved", leaseId);
+        return equipmentLeaseRepository.save(lease);
+    }
+
+    public EquipmentLease closeLease(@NotNull Long leaseId) {
+        log.debug("request to close lease {}", leaseId);
+        EquipmentLease lease = equipmentLeaseRepository.findById(leaseId)
+                .orElseThrow(() -> new GreenFlowException(400, "Lease not found"));
+        Equipment equipment = equipmentRepository.findById(lease.getEquipmentId())
+                .orElseThrow(() -> new GreenFlowException(400, "Equipment not found"));
+        if (lease.getStatus() != LeasingStatus.ACTIVE) {
+            throw new GreenFlowException(400, "Lease is not active");
+        }
+        lease.setStatus(LeasingStatus.CLOSED);
+        lease.setEndDate(LocalDateTime.now());
+
+        equipment.setLeasedBy(null);
+        equipment.setStatus(null);
+        equipmentRepository.save(equipment);
+
+        log.info("Lease {} closed", leaseId);
         return equipmentLeaseRepository.save(lease);
     }
 

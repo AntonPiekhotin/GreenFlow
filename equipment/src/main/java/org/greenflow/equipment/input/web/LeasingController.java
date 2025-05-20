@@ -48,4 +48,10 @@ public class LeasingController {
         return ResponseEntity.ok(leasingService.approveLease(leaseId));
     }
 
+    @PostMapping("/close/{leaseId}")
+    @PreAuthorize("hasAuthority('MANAGER')")
+    public ResponseEntity<?> closeLease(@PathVariable @NotNull Long leaseId) {
+        return ResponseEntity.ok(leasingService.closeLease(leaseId));
+    }
+
 }
