@@ -36,12 +36,13 @@ public abstract class Equipment {
     @Id
     String id;
 
+    boolean leased;
+
     String leasedBy;
 
     @NotNull
     BigDecimal dailyLeasingPrice;
 
-    @NotNull
     @DocumentReference
     Warehouse warehouse;
 

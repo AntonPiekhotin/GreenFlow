@@ -10,7 +10,7 @@ import org.greenflow.equipment.model.dto.WarehouseCreationDto;
 import org.greenflow.equipment.model.dto.WarehouseDto;
 import org.greenflow.equipment.model.dto.WarehouseUpdateDto;
 import org.greenflow.equipment.model.entity.Warehouse;
-import org.greenflow.equipment.ouput.persistent.WarehouseRepository;
+import org.greenflow.equipment.output.persistent.WarehouseRepository;
 import org.greenflow.equipment.service.mapper.WarehouseMapper;
 import org.springframework.stereotype.Service;
 

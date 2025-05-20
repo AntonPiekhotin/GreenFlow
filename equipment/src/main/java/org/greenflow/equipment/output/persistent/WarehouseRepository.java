@@ -1,4 +1,4 @@
-package org.greenflow.equipment.ouput.persistent;
+package org.greenflow.equipment.output.persistent;
 
 import org.greenflow.equipment.model.entity.Warehouse;
 import org.springframework.data.mongodb.repository.MongoRepository;

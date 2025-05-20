@@ -55,7 +55,7 @@ public class Config {
                 .route("open-order", r -> r.path("/api/v1/open-order/**")
                         .filters(f -> f.filter(filter))
                         .uri("http://" + OPEN_ORDER_SERVICE_HOST))
-                .route("equipment", r -> r.path("/api/v1/equipment/**", "/api/v1/warehouse/**")
+                .route("equipment", r -> r.path("/api/v1/equipment/**", "/api/v1/warehouse/**", "/api/v1/leasing/**")
                         .filters(f -> f.filter(filter))
                         .uri("http://" + EQUIPMENT_HOST))
                 .build();

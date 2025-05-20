@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -40,8 +41,9 @@ public class EquipmentLease {
     String lesseeId;
 
     @Column(nullable = false)
+    @CreationTimestamp
     LocalDateTime startDate;
-    @Column(nullable = false)
+
     LocalDateTime endDate;
 
     @Column(nullable = false)
@@ -49,7 +51,7 @@ public class EquipmentLease {
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
-    LeasingStatus status = LeasingStatus.ACTIVE;
+    LeasingStatus status;
 
     public enum LeasingStatus {
         ACTIVE,

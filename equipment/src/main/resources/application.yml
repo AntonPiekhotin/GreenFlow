@@ -5,18 +5,15 @@ spring:
   application:
     name: equipment
 
-  data:
-    mongodb:
-      uri: mongodb://${MONGO_HOST}:${MONGO_PORT}/equipment-db
-      authentication-database: admin
-
-  datasource:
+datasource:
+  equipment:
+    uri: mongodb://${MONGO_HOST}:${MONGO_PORT}/equipment-db
+    authentication-database: admin
+  leasing:
     url: jdbc:postgresql://${LEASING_DB_HOST}:5438/leasing-db
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
-  jpa:
-    hibernate:
-      ddl-auto: create-drop
+    ddl-auto: update
 
 logging:
   level:

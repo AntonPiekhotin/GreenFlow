@@ -6,8 +6,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.equipment.model.entity.Equipment;
-import org.greenflow.equipment.ouput.persistent.EquipmentRepository;
-import org.greenflow.equipment.ouput.persistent.WarehouseRepository;
+import org.greenflow.equipment.output.persistent.EquipmentRepository;
+import org.greenflow.equipment.output.persistent.WarehouseRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.List;

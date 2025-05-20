@@ -31,11 +31,13 @@ public class EquipmentController {
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyAuthority('WORKER', 'MANAGER')")
     public ResponseEntity<?> getEquipment(@PathVariable String id) {
         return ResponseEntity.ok(equipmentService.getEquipmentById(id));
     }
 
     @GetMapping
+    @PreAuthorize("hasAnyAuthority('WORKER', 'MANAGER')")
     public ResponseEntity<?> getEquipmentByWarehouseId(@RequestParam("warehouseId") String warehouseId) {
         return ResponseEntity.ok(equipmentService.getEquipmentByWarehouseId(warehouseId));
     }
