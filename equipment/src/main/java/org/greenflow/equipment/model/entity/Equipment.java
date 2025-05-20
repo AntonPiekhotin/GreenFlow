@@ -13,6 +13,7 @@ import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.greenflow.equipment.model.constant.LeasingStatus;
 import org.greenflow.equipment.model.entity.types.Lawnmower;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -36,7 +37,7 @@ public abstract class Equipment {
     @Id
     String id;
 
-    boolean leased;
+    LeasingStatus status;
 
     String leasedBy;
 

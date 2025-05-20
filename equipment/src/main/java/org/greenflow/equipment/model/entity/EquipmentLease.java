@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
+import org.greenflow.equipment.model.constant.LeasingStatus;
 import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
@@ -31,8 +32,8 @@ import java.time.LocalDateTime;
 public class EquipmentLease {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
 
     @Column(nullable = false)
     String equipmentId;
@@ -53,8 +54,4 @@ public class EquipmentLease {
     @Enumerated(EnumType.STRING)
     LeasingStatus status;
 
-    public enum LeasingStatus {
-        ACTIVE,
-        CLOSED
-    }
 }
