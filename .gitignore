@@ -16,4 +16,5 @@ out/
 /rabbitmq/
 /redis/
 /mongo/
-/manifests/
+
+**/config-map.yaml
