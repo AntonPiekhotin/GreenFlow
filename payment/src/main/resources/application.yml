@@ -18,3 +18,11 @@ logging:
   level:
     greenflow: debug
     root: debug
+
+paypal:
+  client:
+    id: ${PAYPAL_CLIENT_ID}
+    secret: ${PAYPAL_CLIENT_SECRET}
+  mode: ${PAYPAL_MODE}
+
+host: ${BACKEND_HOST}

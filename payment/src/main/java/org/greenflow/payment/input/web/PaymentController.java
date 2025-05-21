@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
@@ -31,14 +32,12 @@ public class PaymentController {
 
     @PostMapping("/{paymentId}")
     public StripeRedirectUrl pay(@RequestHeader(CustomHeaders.X_USER_ID) String userId,
-                                                 @PathVariable @NotBlank String paymentId) {
+                                 @PathVariable @NotBlank String paymentId) {
         return new StripeRedirectUrl(paymentService.pay(userId, paymentId));
     }
 
-    //??
-    @PostMapping("/webhook")
-    public ResponseEntity<?> webhook() {
-        paymentService.confirm();
-        return null;
+    @GetMapping("/success")
+    public ResponseEntity<?> handleSuccessPayment(@RequestParam("paymentId") String paymentId) {
+        return ResponseEntity.ok(paymentService.handleSuccessPayment(paymentId));
     }
 }

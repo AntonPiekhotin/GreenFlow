@@ -18,10 +18,12 @@ import java.util.List;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
+    private final PayPalService payPalService;
 
     public void createPayment(PaymentCreationMessage message) {
         log.info("Creating payment for user: {}, amount: {}, currency: {}, description: {}",
                 message.userId(), message.amount(), message.currency(), message.description());
+        if ()
         Payment payment = Payment.builder()
                 .userId(message.userId())
                 .amount(message.amount())
@@ -37,26 +39,32 @@ public class PaymentService {
         return paymentRepository.findAllByUserId(userId);
     }
 
-
     public String pay(String userId, @NotBlank String paymentId) {
-        var payment = paymentRepository.findById(paymentId)
-                .orElseThrow(() -> new IllegalArgumentException("Payment not found"));
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new GreenFlowException(400, "Payment not found"));
         if(payment.getUserId() != null && !payment.getUserId().equals(userId)) {
             throw new GreenFlowException(403, "You are not allowed to pay this payment");
         }
-        if (!payment.getStatus().equals(PaymentStatus.PENDING)) {
-            throw new GreenFlowException(400, "Payment is not pending");
+        if (payment.getStatus().equals(PaymentStatus.COMPLETED) || payment.getStatus().equals(PaymentStatus.CANCELLED)) {
+            throw new GreenFlowException(400, "Payment is already completed or cancelled");
         }
-        //create stripe url
+        //create PayPal id and url if not present
+        payment = payPalService.createPayPalOrderForPayment(payment);
 
-
-        //return stripe url
-        return "";
+        //return PayPal url
+        return payment.getExternalPaymentUrl();
     }
 
-    public void confirm() {
-        //confirm payment
-        //update payment status
-        //send notification
+    public Payment handleSuccessPayment(@NotBlank String paymentId) {
+        log.info("Got payment confirmation request {}", paymentId);
+        Payment payment = paymentRepository.findById(paymentId)
+                .orElseThrow(() -> new GreenFlowException(400, "Payment not found"));
+        if (payment.getStatus().equals(PaymentStatus.COMPLETED)) {
+            throw new GreenFlowException(400, "Payment is already completed");
+        }
+        payment.setStatus(PaymentStatus.COMPLETED);
+        paymentRepository.save(payment);
+        log.info("Payment completed: {}", paymentId);
+        return payment;
     }
 }

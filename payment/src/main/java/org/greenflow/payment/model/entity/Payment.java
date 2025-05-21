@@ -47,9 +47,9 @@ public class Payment {
 
     String description;
 
-    String stripeSessionId;
+    String externalPaymentId;
 
-    String stripeSessionUrl;
+    String externalPaymentUrl;
 
     @Column(nullable = false)
     @Enumerated(EnumType.STRING)
