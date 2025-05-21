@@ -1,0 +1,20 @@
+server:
+  port: 8089
+
+spring:
+  application:
+    name: payment
+
+  datasource:
+    url: jdbc:postgresql://${WORKER_DB_HOST}:5433/worker-db
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+logging:
+  level:
+    greenflow: debug
+    root: debug
