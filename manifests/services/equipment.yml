@@ -1,0 +1,43 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: equipment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: equipment
+  template:
+    metadata:
+      labels:
+        app: equipment
+    spec:
+      containers:
+        - name: equipment
+          image: kartosha/greenflow.equipment:latest
+          resources:
+            requests:
+              cpu: 200m
+              memory: 300Mi
+            limits:
+              cpu: 300m
+              memory: 400Mi
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8087
+          envFrom:
+            - configMapRef:
+                name: config-map
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: equipment
+spec:
+  type: ClusterIP
+  selector:
+    app: equipment
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8087
