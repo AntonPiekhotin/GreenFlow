@@ -10,6 +10,7 @@ import org.greenflow.payment.model.entity.Payment;
 import org.greenflow.payment.output.persistent.PaymentRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Service
@@ -23,7 +24,6 @@ public class PaymentService {
     public void createPayment(PaymentCreationMessage message) {
         log.info("Creating payment for user: {}, amount: {}, currency: {}, description: {}",
                 message.userId(), message.amount(), message.currency(), message.description());
-        if ()
         Payment payment = Payment.builder()
                 .userId(message.userId())
                 .amount(message.amount())

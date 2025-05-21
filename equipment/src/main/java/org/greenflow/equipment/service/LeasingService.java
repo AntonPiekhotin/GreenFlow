@@ -117,7 +117,11 @@ public class LeasingService {
         long totalHours = java.time.Duration.between(startDate, endDate).toHours();
         long totalDays = totalHours / 24;
         BigDecimal totalAmount = lease.getDailyRate().multiply(BigDecimal.valueOf(totalDays));
-        return totalAmount.setScale(2, RoundingMode.HALF_UP);
+        BigDecimal res = totalAmount.setScale(2, RoundingMode.HALF_UP);
+        if (res.compareTo(BigDecimal.ONE) < 0) {
+            return BigDecimal.ONE;
+        }
+        return res;
     }
 
 }
