@@ -15,11 +15,9 @@ import org.greenflow.order.output.event.RabbitMQProducer;
 import org.greenflow.order.output.persistent.OrderRepository;
 import org.greenflow.order.service.mapper.OrderMapper;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Map;
 
 @Service
 @Slf4j
