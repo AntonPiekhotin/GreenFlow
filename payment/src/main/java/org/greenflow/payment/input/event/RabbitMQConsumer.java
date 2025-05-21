@@ -14,7 +14,7 @@ import static org.greenflow.common.model.constant.RabbitMQConstants.PAYMENT_CREA
 @Slf4j
 public class RabbitMQConsumer {
 
-    PaymentService paymentService;
+    private final PaymentService paymentService;
 
     @RabbitListener(queues = PAYMENT_CREATION_QUEUE)
     public void consumeOrderAssignedMessage(PaymentCreationMessage message) {

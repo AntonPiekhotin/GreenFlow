@@ -16,7 +16,8 @@ service:
     host: ${ORDER_SERVICE_HOST}
   worker:
     host: ${WORKER_SERVICE_HOST}
-
+  payment:
+    host: ${PAYMENT_SERVICE_HOST}
 
 jwt:
   secret: ${JWT_SECRET}
@@ -27,5 +28,5 @@ spring:
 
 logging:
   level:
-    greenflow: DEBUG
+    org.greenflow: DEBUG
     root: debug

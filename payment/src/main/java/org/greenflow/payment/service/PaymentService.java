@@ -21,7 +21,7 @@ public class PaymentService {
     private final PayPalService payPalService;
 
     public void createPayment(PaymentCreationMessage message) {
-        log.info("Creating payment for user: {}, amount: {}, currency: {}, description: {}",
+        log.debug("Creating payment for user: {}, amount: {}, currency: {}, description: {}",
                 message.userId(), message.amount(), message.currency(), message.description());
         Payment payment = Payment.builder()
                 .userId(message.userId())

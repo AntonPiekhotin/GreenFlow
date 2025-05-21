@@ -6,6 +6,7 @@ import org.greenflow.common.model.constant.CustomHeaders;
 import org.greenflow.payment.model.dto.StripeRedirectUrl;
 import org.greenflow.payment.service.PaymentService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -22,6 +23,7 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @GetMapping("/my")
+    @PreAuthorize("hasAnyRole('ROLE_CLIENT', 'ROLE_WORKER')")
     public ResponseEntity<?> my(@RequestHeader(CustomHeaders.X_USER_ID) String userId) {
         var payments = paymentService.getMyPayments(userId);
         if (payments.isEmpty()) {
@@ -31,6 +33,7 @@ public class PaymentController {
     }
 
     @PostMapping("/{paymentId}")
+    @PreAuthorize("hasAnyRole('ROLE_CLIENT', 'ROLE_WORKER')")
     public StripeRedirectUrl pay(@RequestHeader(CustomHeaders.X_USER_ID) String userId,
                                  @PathVariable @NotBlank String paymentId) {
         return new StripeRedirectUrl(paymentService.pay(userId, paymentId));
