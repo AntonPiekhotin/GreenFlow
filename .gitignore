@@ -16,3 +16,4 @@ out/
 /rabbitmq/
 /redis/
 /mongo/
+/manifests/
