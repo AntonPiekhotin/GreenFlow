@@ -45,6 +45,8 @@ public class Payment {
     @Column(nullable = false)
     String currency;
 
+    String description;
+
     String stripeSessionId;
 
     String stripeSessionUrl;

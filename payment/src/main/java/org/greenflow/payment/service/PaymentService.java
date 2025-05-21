@@ -3,6 +3,7 @@ package org.greenflow.payment.service;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.greenflow.common.model.dto.event.PaymentCreationMessage;
 import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.payment.model.constant.PaymentStatus;
 import org.greenflow.payment.model.entity.Payment;
@@ -17,6 +18,20 @@ import java.util.List;
 public class PaymentService {
 
     private final PaymentRepository paymentRepository;
+
+    public void createPayment(PaymentCreationMessage message) {
+        log.info("Creating payment for user: {}, amount: {}, currency: {}, description: {}",
+                message.userId(), message.amount(), message.currency(), message.description());
+        Payment payment = Payment.builder()
+                .userId(message.userId())
+                .amount(message.amount())
+                .currency(message.currency())
+                .description(message.description())
+                .status(PaymentStatus.PENDING)
+                .build();
+        paymentRepository.save(payment);
+        log.info("Payment created: {}", payment.getId());
+    }
 
     public List<Payment> getMyPayments(@NotBlank String userId) {
         return paymentRepository.findAllByUserId(userId);
@@ -44,5 +59,4 @@ public class PaymentService {
         //update payment status
         //send notification
     }
-
 }

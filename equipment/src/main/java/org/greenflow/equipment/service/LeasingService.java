@@ -14,6 +14,8 @@ import org.greenflow.equipment.output.persistent.EquipmentLeaseRepository;
 import org.greenflow.equipment.output.persistent.EquipmentRepository;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -93,11 +95,29 @@ public class LeasingService {
     private void createPayment(EquipmentLease lease) {
         PaymentCreationMessage payment = PaymentCreationMessage.builder()
                 .userId(lease.getLesseeId())
-                .amount(lease.getDailyRate())
+                .amount(calculateTotalAmount(lease))
                 .currency("EUR")
                 .description("Payment for equipment lease " + lease.getId())
                 .build();
         rabbitMQProducer.sendPaymentCreationMessage(payment);
+    }
+
+    /**
+     * Calculates the total amount for the lease based on total hours in the lease period.
+     *
+     * @param lease
+     * @return total payment amount for the lease
+     */
+    private BigDecimal calculateTotalAmount(EquipmentLease lease) {
+        LocalDateTime startDate = lease.getStartDate();
+        LocalDateTime endDate = lease.getEndDate();
+        if (endDate == null) {
+            endDate = LocalDateTime.now();
+        }
+        long totalHours = java.time.Duration.between(startDate, endDate).toHours();
+        long totalDays = totalHours / 24;
+        BigDecimal totalAmount = lease.getDailyRate().multiply(BigDecimal.valueOf(totalDays));
+        return totalAmount.setScale(2, RoundingMode.HALF_UP);
     }
 
 }
