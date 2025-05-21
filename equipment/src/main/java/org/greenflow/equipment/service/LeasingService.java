@@ -4,10 +4,12 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.greenflow.common.model.dto.event.PaymentCreationMessage;
 import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.equipment.model.constant.LeasingStatus;
 import org.greenflow.equipment.model.entity.Equipment;
 import org.greenflow.equipment.model.entity.EquipmentLease;
+import org.greenflow.equipment.output.event.RabbitMQProducer;
 import org.greenflow.equipment.output.persistent.EquipmentLeaseRepository;
 import org.greenflow.equipment.output.persistent.EquipmentRepository;
 import org.springframework.stereotype.Service;
@@ -22,6 +24,7 @@ public class LeasingService {
 
     private final EquipmentRepository equipmentRepository;
     private final EquipmentLeaseRepository equipmentLeaseRepository;
+    private final RabbitMQProducer rabbitMQProducer;
 
     public EquipmentLease requestLeaseEquipment(@NotBlank String equipmentId, @NotBlank String lesseeId) {
         log.debug("request lease equipment {} from worker {}", equipmentId, lesseeId);
@@ -81,8 +84,20 @@ public class LeasingService {
         equipment.setStatus(null);
         equipmentRepository.save(equipment);
 
+        createPayment(lease);
+
         log.info("Lease {} closed", leaseId);
         return equipmentLeaseRepository.save(lease);
+    }
+
+    private void createPayment(EquipmentLease lease) {
+        PaymentCreationMessage payment = PaymentCreationMessage.builder()
+                .userId(lease.getLesseeId())
+                .amount(lease.getDailyRate())
+                .currency("EUR")
+                .description("Payment for equipment lease " + lease.getId())
+                .build();
+        rabbitMQProducer.sendPaymentCreationMessage(payment);
     }
 
 }
