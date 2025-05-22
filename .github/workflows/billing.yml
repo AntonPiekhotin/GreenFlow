@@ -41,7 +41,7 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
-          context: .  # Use the root of the repository to include common and billing
+          context: .  # Use the root of the repository to include common and billing-service
           file: ./billing/Dockerfile  # Path to the Dockerfile
           push: true
           tags: |
