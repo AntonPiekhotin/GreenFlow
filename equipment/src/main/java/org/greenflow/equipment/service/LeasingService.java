@@ -4,7 +4,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.greenflow.common.model.dto.event.PaymentCreationMessage;
+import org.greenflow.common.model.dto.event.BalanceChangeMessage;
 import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.equipment.model.constant.LeasingStatus;
 import org.greenflow.equipment.model.entity.Equipment;
@@ -86,20 +86,19 @@ public class LeasingService {
         equipment.setStatus(null);
         equipmentRepository.save(equipment);
 
-        createPayment(lease);
+        changeWorkerBalance(lease);
 
         log.info("Lease {} closed", leaseId);
         return equipmentLeaseRepository.save(lease);
     }
 
-    private void createPayment(EquipmentLease lease) {
-        PaymentCreationMessage payment = PaymentCreationMessage.builder()
+    private void changeWorkerBalance(EquipmentLease lease) {
+        BalanceChangeMessage balanceChange = BalanceChangeMessage.builder()
                 .userId(lease.getLesseeId())
-                .amount(calculateTotalAmount(lease))
-                .currency("EUR")
-                .description("Payment for equipment lease " + lease.getId())
+                .amount(calculateTotalAmount(lease).negate())
+                .description("For equipment lease " + lease.getId())
                 .build();
-        rabbitMQProducer.sendPaymentCreationMessage(payment);
+        rabbitMQProducer.sendBalanceChangeMessage(balanceChange);
     }
 
     /**

@@ -4,7 +4,8 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.greenflow.common.model.constant.RabbitMQConstants;
-import org.greenflow.common.model.dto.event.PaymentCreationMessage;
+import org.greenflow.common.model.dto.event.BalanceChangeMessage;
+import org.greenflow.common.model.exception.GreenFlowException;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Service;
 
@@ -17,15 +18,15 @@ public class RabbitMQProducer {
     private final RabbitTemplate rabbitTemplate;
 
 
-    public void sendPaymentCreationMessage(@NotNull PaymentCreationMessage message) {
+    public void sendBalanceChangeMessage(@NotNull BalanceChangeMessage message) {
         log.debug("Sending message to RabbitMQ: {}", message);
         try {
-            rabbitTemplate.convertAndSend(RabbitMQConstants.PAYMENT_EXCHANGE, RabbitMQConstants.PAYMENT_CREATION_QUEUE,
+            rabbitTemplate.convertAndSend(RabbitMQConstants.BALANCE_EXCHANGE, RabbitMQConstants.BALANCE_CHANGE_QUEUE,
                     message);
-            log.info("Payment creation message sent to RabbitMQ: {}", message);
+            log.info("Balance change message sent to RabbitMQ: {}", message);
         } catch (Exception e) {
             log.error(FAILED_TO_SEND_MESSAGE_TO_RABBIT_MQ, e);
-            throw new RuntimeException(FAILED_TO_SEND_MESSAGE_TO_RABBIT_MQ, e);
+            throw new GreenFlowException(503, FAILED_TO_SEND_MESSAGE_TO_RABBIT_MQ, e);
         }
     }
 }

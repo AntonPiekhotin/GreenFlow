@@ -1,0 +1,33 @@
+server:
+  port: 8089
+
+spring:
+  application:
+    name: billing-service
+
+  datasource:
+    url: jdbc:postgresql://${BILLING_DB_HOST}:5439/billing-db
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+  rabbitmq:
+    host: ${RABBITMQ_HOST}
+    port: ${RABBITMQ_PORT}
+    username: ${RABBITMQ_USERNAME}
+    password: ${RABBITMQ_PASSWORD}
+
+logging:
+  level:
+    org.greenflow: debug
+
+paypal:
+  client:
+    id: ${PAYPAL_CLIENT_ID}
+    secret: ${PAYPAL_CLIENT_SECRET}
+  mode: ${PAYPAL_MODE}
+
+host: ${BACKEND_HOST}

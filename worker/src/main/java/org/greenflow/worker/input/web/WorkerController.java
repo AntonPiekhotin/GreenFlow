@@ -46,4 +46,10 @@ public class WorkerController {
         WorkerDto worker = workerService.updateWorker(id, workerDto);
         return ResponseEntity.ok(worker);
     }
+
+    @GetMapping("/balance")
+    @PreAuthorize("hasAuthority('WORKER')")
+    public ResponseEntity<?> getBalance(@RequestHeader(CustomHeaders.X_USER_ID) String userId) {
+        return ResponseEntity.ok(workerService.getWorkerBalance(userId));
+    }
 }

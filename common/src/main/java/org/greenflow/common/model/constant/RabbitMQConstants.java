@@ -10,11 +10,11 @@ public class RabbitMQConstants {
     public static final String ORDER_DELETION_QUEUE = "order.deletion.queue";
     public static final String ORDER_ASSIGNED_QUEUE = "order.assigned.queue";
     public static final String NOTIFICATION_QUEUE = "notification.queue";
-    public static final String PAYMENT_CREATION_QUEUE = "payment.creation.queue";
+    public static final String BALANCE_CHANGE_QUEUE = "balance.change.queue";
 
     public static final String ORDER_EXCHANGE = "order.exchange";
     public static final String NOTIFICATION_EXCHANGE = "notification.exchange";
-    public static final String PAYMENT_EXCHANGE = "payment.exchange";
+    public static final String BALANCE_EXCHANGE = "balance.exchange";
 
     private RabbitMQConstants() {
     }

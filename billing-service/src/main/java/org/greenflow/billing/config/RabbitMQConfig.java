@@ -1,4 +1,4 @@
-package org.greenflow.equipment.config;
+package org.greenflow.billing.config;
 
 import org.greenflow.common.model.constant.RabbitMQConstants;
 import org.springframework.amqp.core.Binding;

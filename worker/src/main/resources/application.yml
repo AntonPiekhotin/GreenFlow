@@ -17,3 +17,6 @@ spring:
 logging:
   level:
     org.greenflow: debug
+
+host:
+  billing: ${BILLING_SERVICE_HOST}

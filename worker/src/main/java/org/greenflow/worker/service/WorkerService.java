@@ -1,5 +1,6 @@
 package org.greenflow.worker.service;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +11,11 @@ import org.greenflow.worker.model.dto.WorkerDto;
 import org.greenflow.worker.model.entity.Worker;
 import org.greenflow.worker.output.persistent.WorkerRepository;
 import org.greenflow.worker.service.mapper.WorkerMapper;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +23,17 @@ import org.springframework.stereotype.Service;
 public class WorkerService {
 
     private final WorkerRepository workerRepository;
+    private final RestTemplate restTemplate;
+
+    @Value("${host.billing}")
+    private String BILLING_SERVICE_HOST;
+
+    private String BILLING_SERVICE_URL;
+
+    @PostConstruct
+    public void init() {
+        BILLING_SERVICE_URL = "http://" + BILLING_SERVICE_HOST + "/api/v1/billing";
+    }
 
     public boolean saveWorker(UserCreationDto workerDto) {
         if (workerRepository.existsByEmail(workerDto.email())) {
@@ -49,5 +65,16 @@ public class WorkerService {
 
         log.info("Worker {} updated", worker.getEmail());
         return WorkerMapper.INSTANCE.toDto(worker);
+    }
+
+    public BigDecimal getWorkerBalance(String userId) {
+        try {
+            BigDecimal response = restTemplate.getForObject(BILLING_SERVICE_URL + "/balance?userId=" + userId,
+                    BigDecimal.class);
+            return response;
+        } catch (Exception e) {
+            log.error("Error occurred while getting worker balance", e);
+            throw new GreenFlowException(503, "Error occurred while getting worker balance");
+        }
     }
 }
