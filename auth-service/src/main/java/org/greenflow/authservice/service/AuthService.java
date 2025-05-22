@@ -39,14 +39,19 @@ public class AuthService {
 
     @Value("${host.worker}")
     private String WORKER_HOST;
+    
+    @Value("${host.billing}")
+    private String BILLING_HOST;
 
     private String CLIENT_SERVICE_URL;
     private String WORKER_SERVICE_URL;
+    private String BILLING_SERVICE_URL;
 
     @PostConstruct
     public void init() {
         CLIENT_SERVICE_URL = "http://" + CLIENT_HOST + "/api/v1";
         WORKER_SERVICE_URL = "http://" + WORKER_HOST + "/api/v1";
+        BILLING_SERVICE_URL = "http://" + BILLING_HOST + "/api/v1";
     }
 
     public Optional<User> findByEmail(String email) {
@@ -61,14 +66,16 @@ public class AuthService {
     @Transactional
     public User registerUser(@Valid SignupRequest signUpRequest) {
         log.info("Registering user: {}", signUpRequest);
+        User user = new User();
         if (signUpRequest.getRole().equals("CLIENT")) {
-            return registerClient(signUpRequest);
+            user = registerClient(signUpRequest);
         } else if (signUpRequest.getRole().equals("WORKER")) {
-            return registerWorker(signUpRequest);
+            user = registerWorker(signUpRequest);
+        } else {
+            throw new GreenFlowException(HttpStatus.BAD_REQUEST.value(), "Invalid role: " + signUpRequest.getRole());
         }
-
-        // should not be reached
-        throw new GreenFlowException(HttpStatus.BAD_REQUEST.value(), "Invalid role: " + signUpRequest.getRole());
+        saveToBillingService(user);
+        return user;
     }
 
     private User registerClient(SignupRequest signUpRequest) {
@@ -152,6 +159,20 @@ public class AuthService {
         } catch (Exception e) {
             log.error("Error occurred while saving worker in worker-service: {}", user.getEmail(), e);
             return false;
+        }
+    }
+
+    private void saveToBillingService(User user) {
+        try {
+            Boolean response = restTemplate.postForObject(BILLING_SERVICE_URL +
+                    "/billing/register?userId=" + user.getId(), null, Boolean.class);
+            if (response != null && response) {
+                log.debug("User saved in billing-service: {}", user.getEmail());
+            } else {
+                log.error("Failed to save billing in billing-service: {}", user.getEmail());
+            }
+        } catch (Exception e) {
+            log.error("Error occurred while saving billing in billing-service: {}", user.getEmail(), e);
         }
     }
 }

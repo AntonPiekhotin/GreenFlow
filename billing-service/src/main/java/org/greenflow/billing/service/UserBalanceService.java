@@ -18,6 +18,16 @@ public class UserBalanceService {
 
     private final UserBalanceRepository userBalanceRepository;
 
+    public Boolean registerUser(@NotBlank String userId) {
+        log.debug("Registering user {}", userId);
+        UserBalance userBalance = new UserBalance();
+        userBalance.setUserId(userId);
+        userBalance.setBalance(BigDecimal.ZERO);
+        userBalanceRepository.save(userBalance);
+        log.info("User balance registered: {}", userBalance);
+        return Boolean.TRUE;
+    }
+
     public void changeBalance(BalanceChangeMessage message) {
         log.debug("Changing balance for user {}", message.userId());
         UserBalance userBalance = userBalanceRepository.findById(message.userId())

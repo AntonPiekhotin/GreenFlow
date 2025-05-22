@@ -8,6 +8,7 @@ jwt:
 host:
   client: ${CLIENT_SERVICE_HOST}
   worker: ${WORKER_SERVICE_HOST}
+  billing: ${BILLING_SERVICE_HOST}
 
 spring:
   application:
