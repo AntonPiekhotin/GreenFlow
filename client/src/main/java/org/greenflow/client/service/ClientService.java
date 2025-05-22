@@ -1,5 +1,6 @@
 package org.greenflow.client.service;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
@@ -10,7 +11,11 @@ import org.greenflow.client.output.persistent.ClientRepository;
 import org.greenflow.client.service.mapper.ClientMapper;
 import org.greenflow.common.model.dto.UserCreationDto;
 import org.greenflow.common.model.exception.GreenFlowException;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
@@ -18,6 +23,17 @@ import org.springframework.stereotype.Service;
 public class ClientService {
 
     private final ClientRepository clientRepository;
+    private final RestTemplate restTemplate;
+
+    @Value("${host.billing}")
+    private String BILLING_SERVICE_HOST;
+
+    private String BILLING_SERVICE_URL;
+
+    @PostConstruct
+    public void init() {
+        BILLING_SERVICE_URL = "http://" + BILLING_SERVICE_HOST + "/api/v1/billing";
+    }
 
     public ClientDto getClientById(String id) {
         return ClientMapper.INSTANCE.toDto(clientRepository.findById(id).orElse(null));
@@ -49,5 +65,16 @@ public class ClientService {
 
         log.info("Client {} updated", client.getEmail());
         return ClientMapper.INSTANCE.toDto(client);
+    }
+
+    public BigDecimal getClientBalance(String userId) {
+        try {
+            BigDecimal response = restTemplate.getForObject(BILLING_SERVICE_URL + "/balance?userId=" + userId,
+                    BigDecimal.class);
+            return response;
+        } catch (Exception e) {
+            log.error("Error occurred while getting client balance", e);
+            throw new GreenFlowException(503, "Error occurred while getting client balance");
+        }
     }
 }

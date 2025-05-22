@@ -47,4 +47,10 @@ public class ClientController {
         return ResponseEntity.ok(client);
     }
 
+    @GetMapping("/balance")
+    @PreAuthorize("hasAuthority('CLIENT')")
+    public ResponseEntity<?> getBalance(@RequestHeader(CustomHeaders.X_USER_ID) String userId) {
+        return ResponseEntity.ok(clientService.getClientBalance(userId));
+    }
+
 }

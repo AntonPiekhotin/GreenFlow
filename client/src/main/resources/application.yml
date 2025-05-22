@@ -13,7 +13,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
 
 logging:
   level:
-    greenflow: DEBUG
+    org.greenflow: DEBUG
+
+host:
+  billing: ${BILLING_SERVICE_HOST}
