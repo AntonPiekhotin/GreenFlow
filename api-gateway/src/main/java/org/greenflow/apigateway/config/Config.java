@@ -35,9 +35,6 @@ public class Config {
     @Value("${service.equipment.host}")
     private String EQUIPMENT_HOST;
 
-    @Value("${service.payment.host}")
-    private String PAYMENT_HOST;
-
     @Bean
     public RouteLocator routes(RouteLocatorBuilder builder) {
         return builder.routes()
@@ -61,9 +58,6 @@ public class Config {
                 .route("equipment", r -> r.path("/api/v1/equipment/**", "/api/v1/warehouse/**", "/api/v1/leasing/**")
                         .filters(f -> f.filter(filter))
                         .uri("http://" + EQUIPMENT_HOST))
-                .route("payment", r -> r.path("/api/v1/payment/**")
-                        .filters(f -> f.filter(filter))
-                        .uri("http://" + PAYMENT_HOST))
                 .build();
     }
 }
