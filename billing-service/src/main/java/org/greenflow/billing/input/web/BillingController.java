@@ -24,7 +24,7 @@ public class BillingController {
         return ResponseEntity.ok(balanceService.getUserBalance(userId));
     }
     
-    @PostMapping("/register")
+    @GetMapping("/register")
     public Boolean registerUser(@RequestParam("userId") @NotBlank String userId) {
         return balanceService.registerUser(userId);
     }

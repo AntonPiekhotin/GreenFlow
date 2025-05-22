@@ -39,7 +39,7 @@ public class AuthService {
 
     @Value("${host.worker}")
     private String WORKER_HOST;
-    
+
     @Value("${host.billing}")
     private String BILLING_HOST;
 
@@ -65,17 +65,23 @@ public class AuthService {
 
     @Transactional
     public User registerUser(@Valid SignupRequest signUpRequest) {
-        log.info("Registering user: {}", signUpRequest);
-        User user = new User();
-        if (signUpRequest.getRole().equals("CLIENT")) {
-            user = registerClient(signUpRequest);
-        } else if (signUpRequest.getRole().equals("WORKER")) {
-            user = registerWorker(signUpRequest);
-        } else {
-            throw new GreenFlowException(HttpStatus.BAD_REQUEST.value(), "Invalid role: " + signUpRequest.getRole());
+        try {
+            log.info("Registering user: {}", signUpRequest);
+            User user = new User();
+            if (signUpRequest.getRole().equals("CLIENT")) {
+                user = registerClient(signUpRequest);
+            } else if (signUpRequest.getRole().equals("WORKER")) {
+                user = registerWorker(signUpRequest);
+            } else {
+                throw new GreenFlowException(HttpStatus.BAD_REQUEST.value(),
+                        "Invalid role: " + signUpRequest.getRole());
+            }
+            saveToBillingService(user);
+            return user;
+        } catch (Exception e) {
+            log.error("Error occurred while registering user: {}", signUpRequest, e);
+            throw new GreenFlowException(500, "Error occurred while registering user: " + e.getMessage());
         }
-        saveToBillingService(user);
-        return user;
     }
 
     private User registerClient(SignupRequest signUpRequest) {
@@ -162,17 +168,13 @@ public class AuthService {
         }
     }
 
-    private void saveToBillingService(User user) {
-        try {
-            Boolean response = restTemplate.postForObject(BILLING_SERVICE_URL +
-                    "/billing/register?userId=" + user.getId(), null, Boolean.class);
-            if (response != null && response) {
-                log.debug("User saved in billing-service: {}", user.getEmail());
-            } else {
-                log.error("Failed to save billing in billing-service: {}", user.getEmail());
-            }
-        } catch (Exception e) {
-            log.error("Error occurred while saving billing in billing-service: {}", user.getEmail(), e);
+    private void saveToBillingService(User user) throws Exception {
+        Boolean response = restTemplate.getForObject(BILLING_SERVICE_URL +
+                "/billing/register?userId=" + user.getId(), Boolean.class);
+        if (response != null && response) {
+            log.debug("User saved in billing-service: {}", user.getEmail());
+        } else {
+            log.error("Failed to save user in billing-service: {}", user.getEmail());
         }
     }
 }
