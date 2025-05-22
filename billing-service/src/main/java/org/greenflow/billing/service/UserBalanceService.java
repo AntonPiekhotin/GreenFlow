@@ -34,7 +34,7 @@ public class UserBalanceService {
                 .orElseThrow(() -> new GreenFlowException(400, "User balance not found"));
         userBalance.setBalance(userBalance.getBalance().add(message.amount()));
         userBalanceRepository.save(userBalance);
-        log.info("User balance updated: {}", userBalance);
+        log.info("User balance updated: {}, new balance {}", userBalance.getUserId(), userBalance.getBalance());
     }
 
     public BigDecimal getUserBalance(@NotBlank String userId) {
