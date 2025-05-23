@@ -59,6 +59,6 @@ public class BillingController {
 
     @GetMapping("/success")
     public ResponseEntity<?> handleSuccessPayment(@RequestParam("paymentId") String paymentId) {
-        return ResponseEntity.ok(handleSuccessPayment(paymentId));
+        return ResponseEntity.ok(paymentService.handleSuccessPayment(paymentId));
     }
 }
