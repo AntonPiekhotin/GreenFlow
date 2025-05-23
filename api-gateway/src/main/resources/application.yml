@@ -27,4 +27,3 @@ spring:
 logging:
   level:
     org.greenflow: DEBUG
-    root: debug
