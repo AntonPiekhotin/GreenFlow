@@ -60,5 +60,5 @@ spec:
     app: billing-db
   ports:
     - protocol: TCP
-      port: 5433
+      port: 5439
       targetPort: 5432
