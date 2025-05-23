@@ -1,14 +1,26 @@
 package org.greenflow.client.config;
 
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.client.RestTemplate;
 
+import static org.greenflow.common.model.constant.CustomHeaders.X_INTERNAL_TOKEN;
+
 @Configuration
 public class ClientServiceConfig {
 
+    @Value("${api.internalApiToken}")
+    private String internalToken;
+
     @Bean
-    public RestTemplate restTemplate() {
-        return new RestTemplate();
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder
+                .additionalInterceptors((request, body, execution) -> {
+                    request.getHeaders().add(X_INTERNAL_TOKEN, internalToken);
+                    return execution.execute(request, body);
+                })
+                .build();
     }
 }

@@ -22,8 +22,6 @@ public class AuthenticationFilter implements GatewayFilter {
 
     private final JwtUtil jwtUtil;
     private static final List<String> CLOSED_ROUTES = List.of(
-            "/api/v1/worker/save",
-            "/api/v1/client/save"
     );
 
     @Override

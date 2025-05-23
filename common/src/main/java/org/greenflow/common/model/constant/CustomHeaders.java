@@ -8,6 +8,7 @@ public class CustomHeaders {
     public static final String X_EMAIL = "X-Email";
     public static final String X_ROLES = "X-Roles";
     public static final String X_USER_ID = "X-User-Id";
+    public static final String X_INTERNAL_TOKEN = "X-Internal-Token";
 
     private CustomHeaders() {
     }

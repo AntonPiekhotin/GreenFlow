@@ -26,7 +26,7 @@ public class WorkerService {
     private final WorkerRepository workerRepository;
     private final RestTemplate restTemplate;
 
-    @Value("${host.billing}")
+    @Value("${api.host.billing}")
     private String BILLING_SERVICE_HOST;
 
     private String BILLING_SERVICE_URL;

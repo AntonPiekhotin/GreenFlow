@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.greenflow.common.model.constant.CustomHeaders;
 import org.greenflow.common.model.dto.UserCreationDto;
+import org.greenflow.common.util.InternalAuth;
 import org.greenflow.worker.model.dto.WorkerDto;
 import org.greenflow.worker.service.WorkerService;
 import org.springframework.http.HttpStatus;
@@ -30,6 +31,7 @@ public class WorkerController {
 
     private final WorkerService workerService;
 
+    @InternalAuth
     @PostMapping("/save")
     public boolean saveWorker(@RequestBody UserCreationDto workerDto) {
         workerService.saveWorker(workerDto);

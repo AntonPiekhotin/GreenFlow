@@ -25,7 +25,7 @@ public class ClientService {
     private final ClientRepository clientRepository;
     private final RestTemplate restTemplate;
 
-    @Value("${host.billing}")
+    @Value("${api.host.billing}")
     private String BILLING_SERVICE_HOST;
 
     private String BILLING_SERVICE_URL;

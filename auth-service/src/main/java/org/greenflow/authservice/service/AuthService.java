@@ -34,13 +34,13 @@ public class AuthService {
     private final AuthenticationManager authenticationManager;
     private final RestTemplate restTemplate;
 
-    @Value("${host.client}")
+    @Value("${api.host.client}")
     private String CLIENT_HOST;
 
-    @Value("${host.worker}")
+    @Value("${api.host.worker}")
     private String WORKER_HOST;
 
-    @Value("${host.billing}")
+    @Value("${api.host.billing}")
     private String BILLING_HOST;
 
     private String CLIENT_SERVICE_URL;

@@ -6,6 +6,7 @@ import org.greenflow.client.model.dto.ClientDto;
 import org.greenflow.client.service.ClientService;
 import org.greenflow.common.model.constant.CustomHeaders;
 import org.greenflow.common.model.dto.UserCreationDto;
+import org.greenflow.common.util.InternalAuth;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +34,7 @@ public class ClientController {
         return ResponseEntity.ok(client);
     }
 
+    @InternalAuth
     @PostMapping("/save")
     public boolean saveClient(@RequestBody UserCreationDto clientDto) {
         clientService.saveClient(clientDto);

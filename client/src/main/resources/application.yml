@@ -19,5 +19,7 @@ logging:
   level:
     org.greenflow: DEBUG
 
-host:
-  billing: ${BILLING_SERVICE_HOST}
+api:
+  internalApiToken: ${INTERNAL_API_TOKEN}
+  host:
+    billing: ${BILLING_SERVICE_HOST}

@@ -17,7 +17,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.math.BigDecimal;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.List;
@@ -28,7 +27,7 @@ import java.util.Locale;
 @Slf4j
 public class PayPalService {
 
-    @Value("${host}")
+    @Value("${api.host.backend}")
     private String backendHost;
 
     private final PayPalHttpClient client;

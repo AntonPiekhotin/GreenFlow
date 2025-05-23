@@ -5,10 +5,12 @@ jwt:
   secret: ${JWT_SECRET}
   expiration: ${JWT_EXPIRATION}
 
-host:
-  client: ${CLIENT_SERVICE_HOST}
-  worker: ${WORKER_SERVICE_HOST}
-  billing: ${BILLING_SERVICE_HOST}
+api:
+  internalApiToken: ${INTERNAL_API_TOKEN}
+  host:
+    client: ${CLIENT_SERVICE_HOST}
+    worker: ${WORKER_SERVICE_HOST}
+    billing: ${BILLING_SERVICE_HOST}
 
 spring:
   application:

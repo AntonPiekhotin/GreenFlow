@@ -30,6 +30,8 @@ paypal:
     secret: ${PAYPAL_CLIENT_SECRET}
   mode: ${PAYPAL_MODE}
 
-host: ${BACKEND_HOST}
-frontend:
-  host: ${FRONTEND_HOST}
+api:
+  internalApiToken: ${INTERNAL_API_TOKEN}
+  host:
+    backend: ${BACKEND_HOST}
+    frontend: ${FRONTEND_HOST}
