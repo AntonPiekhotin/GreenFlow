@@ -1,6 +1,7 @@
 package org.greenflow.billing.service;
 
 import com.paypal.core.PayPalHttpClient;
+import com.paypal.http.HttpResponse;
 import com.paypal.orders.AmountWithBreakdown;
 import com.paypal.orders.ApplicationContext;
 import com.paypal.orders.Order;
@@ -9,15 +10,18 @@ import com.paypal.orders.OrdersCreateRequest;
 import com.paypal.orders.PurchaseUnitRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.billing.model.constant.PaymentStatus;
 import org.greenflow.billing.model.entity.Payment;
+import org.greenflow.billing.output.persistent.PaymentRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.List;
+import java.util.Locale;
 
 @Service
 @RequiredArgsConstructor
@@ -28,56 +32,48 @@ public class PayPalService {
     private String backendHost;
 
     private final PayPalHttpClient client;
+    private final PaymentRepository paymentRepository;
 
     /**
-     * Creates a PayPal order for the given payment. Fills the external payment ID and URL in the given payment object.
-     * If the payment already has an external payment ID and URL, it will not create a new order.
-     * @param payment the payment object to create an order for
-     * @return the updated payment object with the external payment ID and URL
+     * Створює PayPal Order, зберігає його ID та approveUrl в Payment і повертає URL для редіректу.
      */
-    public Payment createPayPalOrderForPayment(Payment payment){
-        if (payment.getExternalPaymentId() == null || payment.getExternalPaymentUrl() == null) {
-            long amountCents = payment.getAmount()
-                    .multiply(new BigDecimal(100))
-                    .longValue();
+    public String createPaymentUrl(Payment payment) throws IOException {
+        DecimalFormat df = new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.US));
+        String amount = df.format(payment.getAmount());
 
-            OrdersCreateRequest request = createRequest(payment, amountCents);
-            Order order;
-            try {
-                order = client.execute(request).result();
-            } catch (IOException e) {
-                throw new GreenFlowException(500, "Exception during Paypal api call", e);
-            }
-
-            String approveUrl = order.links().stream()
-                    .filter(l -> "approve".equals(l.rel()))
-                    .findFirst()
-                    .orElseThrow(() -> new GreenFlowException(500, "No approve link in PayPal response"))
-                    .href();
-
-            payment.setExternalPaymentId(order.id());
-            payment.setExternalPaymentUrl(approveUrl);
-            payment.setStatus(PaymentStatus.PENDING);
-        }
-        return payment;
-    }
-
-    private OrdersCreateRequest createRequest(Payment payment, long amountCents) {
-        return new OrdersCreateRequest()
-                .requestBody(new OrderRequest()
-                        .checkoutPaymentIntent("CAPTURE")
-                        .purchaseUnits(List.of(
-                                new PurchaseUnitRequest()
-                                        .referenceId(payment.getId())
-                                        .amountWithBreakdown(new AmountWithBreakdown()
-                                                .currencyCode(payment.getCurrency())
-                                                .value(String.format("%.2f", amountCents / 100.0))
-                                        )
-                        ))
-                        .applicationContext(new ApplicationContext()
-                                .returnUrl("http://" + backendHost + "/api/v1/payment/success?paymentId=" + payment.getId())
-                                .cancelUrl("http://" + backendHost + "/api/v1/payment/cancel?paymentId=" + payment.getId())
-                        )
+        OrderRequest orderRequest = new OrderRequest()
+                .checkoutPaymentIntent("CAPTURE")
+                .purchaseUnits(List.of(
+                        new PurchaseUnitRequest()
+                                .referenceId(payment.getId())
+                                .amountWithBreakdown(new AmountWithBreakdown()
+                                        .currencyCode(payment.getCurrency())
+                                        .value(amount)
+                                )
+                ))
+                .applicationContext(new ApplicationContext()
+                        .returnUrl("http://" + backendHost + "/api/v1/billing/success?paymentId=" + payment.getId())
+                        .cancelUrl("http://" + backendHost + "/api/v1/billing/cancel/" + payment.getId() + "?cancelled=true")
                 );
+
+        OrdersCreateRequest request = new OrdersCreateRequest()
+                .requestBody(orderRequest);
+
+        HttpResponse<Order> response = client.execute(request);
+        Order order = response.result();
+
+        String approveUrl = order.links().stream()
+                .filter(l -> "approve".equals(l.rel()))
+                .findFirst()
+                .orElseThrow(() -> new IllegalStateException("No approve link in PayPal response"))
+                .href();
+
+        payment.setExternalPaymentId(order.id());
+        payment.setExternalPaymentUrl(approveUrl);
+        payment.setStatus(PaymentStatus.PENDING);
+        paymentRepository.save(payment);
+
+        log.info("Created PayPal Order {} for payment {} – redirect URL: {}", order.id(), payment.getId(), approveUrl);
+        return approveUrl;
     }
 }

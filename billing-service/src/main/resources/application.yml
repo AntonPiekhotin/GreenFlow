@@ -31,3 +31,5 @@ paypal:
   mode: ${PAYPAL_MODE}
 
 host: ${BACKEND_HOST}
+frontend:
+  host: ${FRONTEND_HOST}

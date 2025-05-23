@@ -27,6 +27,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/v1/billing/register").permitAll()
                         .requestMatchers("/api/v1/billing/balance").permitAll()
+                        .requestMatchers("/api/v1/billing/topup").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(headerAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
