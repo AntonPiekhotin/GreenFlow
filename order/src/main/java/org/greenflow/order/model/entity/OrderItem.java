@@ -1,5 +1,6 @@
 package org.greenflow.order.model.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -30,6 +31,7 @@ public class OrderItem {
     @GeneratedValue(strategy = GenerationType.UUID)
     String id;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
     Order order;

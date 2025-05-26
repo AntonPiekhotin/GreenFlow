@@ -11,12 +11,15 @@ import org.greenflow.order.model.constant.OrderStatus;
 import org.greenflow.order.model.dto.OrderCreationDto;
 import org.greenflow.order.model.dto.OrderUpdateDto;
 import org.greenflow.order.model.entity.Order;
+import org.greenflow.order.model.entity.OrderItem;
 import org.greenflow.order.output.event.RabbitMQProducer;
 import org.greenflow.order.output.persistent.OrderRepository;
+import org.greenflow.order.output.persistent.ServiceRepository;
 import org.greenflow.order.service.mapper.OrderMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -28,6 +31,7 @@ public class OrderService {
     public static final String ORDER_NOT_FOUND_MESSAGE = "Order not found";
 
     private final OrderRepository orderRepository;
+    private final ServiceRepository serviceRepository;
     private final RabbitMQProducer rabbitMQProducer;
 
     public Order createOrder(@NotBlank String clientId, @NotBlank String clientEmail,
@@ -36,6 +40,7 @@ public class OrderService {
         order.setClientId(clientId);
         order.setStatus(OrderStatus.CREATED);
         order = orderRepository.save(order);
+        createOrderItems(order, orderDto);
 
         rabbitMQProducer.sendOrderOpeningMessage(order, clientEmail);
 
@@ -44,6 +49,23 @@ public class OrderService {
 
         log.info("Client {} created order: {}", order.getClientId(), order.getId());
         return order;
+    }
+
+    private void createOrderItems(Order order, OrderCreationDto orderCreationDto) {
+        List<OrderItem> orderItems = new ArrayList<>();
+        for (var itemDto : orderCreationDto.getOrderItems()) {
+            OrderItem orderItem = new OrderItem();
+            orderItem.setOrder(order);
+            orderItem.setService(serviceRepository.findById(itemDto.getServiceId()).orElseThrow(() ->
+                    new GreenFlowException(HttpStatus.NOT_FOUND.value(), "Service not found with ID: "
+                            + itemDto.getServiceId()))
+            );
+            orderItem.setQuantity(itemDto.getQuantity());
+            orderItems.add(orderItem);
+        }
+        order.setOrderItems(orderItems);
+        orderRepository.save(order);
+        log.info("Created {} order items for order {}", orderItems.size(), order.getId());
     }
 
     public List<Order> getOrdersByOwnerId(@NotBlank String clientId) {

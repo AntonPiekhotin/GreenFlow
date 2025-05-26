@@ -1,9 +1,9 @@
-package org.greenflow.order.output.persistent;
-
-import org.greenflow.order.model.entity.Price;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
-
-@Repository
-public interface PriceRepository extends JpaRepository<Price, Long> {
-}
+//package org.greenflow.order.output.persistent;
+//
+//import org.greenflow.order.model.entity.Price;
+//import org.springframework.data.jpa.repository.JpaRepository;
+//import org.springframework.stereotype.Repository;
+//
+//@Repository
+//public interface PriceRepository extends JpaRepository<Price, Long> {
+//}

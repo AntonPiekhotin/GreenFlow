@@ -42,7 +42,7 @@ public class DataInitializer implements CommandLineRunner {
         User admin = User.builder()
                 .email("admin@admin.com")
                 .password(passwordEncoder.encode("admin"))
-                .roles(Roles.of(RoleType.ADMIN, RoleType.MANAGER))
+                .roles(Roles.of(RoleType.ADMIN, RoleType.MANAGER, RoleType.CLIENT, RoleType.WORKER))
                 .build();
         userRepository.save(admin);
         if (userRepository.existsByEmail("manager@manager.com")) {

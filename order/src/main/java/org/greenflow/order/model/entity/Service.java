@@ -16,6 +16,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -38,7 +39,7 @@ public class Service {
     @Column(nullable = false)
     String unit;
 
-    @OneToMany(mappedBy = "service", cascade = CascadeType.ALL)
-    List<Price> prices;
+    @Column(nullable = false)
+    BigDecimal pricePerUnit;
 
 }

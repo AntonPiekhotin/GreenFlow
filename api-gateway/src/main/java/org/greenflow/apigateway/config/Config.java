@@ -49,7 +49,7 @@ public class Config {
                 .route("garden", r -> r.path("/api/v1/garden/**")
                         .filters(f -> f.filter(filter))
                         .uri("http://" + GARDEN_SERVICE_HOST))
-                .route("order", r -> r.path("/api/v1/order/**")
+                .route("order", r -> r.path("/api/v1/order/**", "/api/v1/services/**")
                         .filters(f -> f.filter(filter))
                         .uri("http://" + ORDER_SERVICE_HOST))
                 .route("open-order", r -> r.path("/api/v1/open-order/**")

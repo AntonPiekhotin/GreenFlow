@@ -2,6 +2,7 @@ package org.greenflow.order.model.dto;
 
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -11,6 +12,8 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 @Data
 @Builder
@@ -36,4 +39,7 @@ public class OrderCreationDto {
     LocalDate startDate;
 
     String description;
+
+    @NotEmpty(message = "Order items cannot be empty")
+    List<OrderItemCreationDto> orderItems = new ArrayList<>();
 }
