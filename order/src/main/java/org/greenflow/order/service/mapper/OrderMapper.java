@@ -8,7 +8,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(uses = {
-    OrderItemMapper.class
+    OrderItemMapper.class,
+    ServiceMapper.class
 })
 public interface OrderMapper {
 
