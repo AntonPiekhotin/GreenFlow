@@ -32,9 +32,6 @@ public class GardenController {
     @PreAuthorize("hasAuthority('CLIENT')")
     public ResponseEntity<?> getMyGardens(@RequestHeader(CustomHeaders.X_USER_ID) String userId) {
         List<Garden> gardens = gardenService.getGardensByOwnerId(userId);
-        if (gardens.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(List.of());
-        }
         return ResponseEntity.ok(gardens);
     }
 

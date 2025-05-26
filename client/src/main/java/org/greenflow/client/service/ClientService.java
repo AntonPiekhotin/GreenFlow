@@ -57,7 +57,7 @@ public class ClientService {
         Client client = clientRepository.findById(id).orElse(null);
         if (client == null) {
             log.error("Client not found in client service: {}", id);
-            throw new GreenFlowException(404, "Client not found for id: " + id);
+            throw new GreenFlowException(400, "Client not found for id: " + id);
         }
         client = ClientMapper.INSTANCE.toEntity(clientDto);
         client.setId(id);

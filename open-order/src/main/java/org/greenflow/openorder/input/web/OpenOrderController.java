@@ -28,9 +28,6 @@ public class OpenOrderController {
     @PreAuthorize("hasAuthority('WORKER')")
     public ResponseEntity<?> getOpenOrders(@RequestBody @Valid OpenOrdersRequestDto request) {
         var openOrders = openOrderService.getOpenOrdersWithinRadius(request);
-        if (openOrders.isEmpty()) {
-            return ResponseEntity.status(404).body(List.of());
-        }
         return ResponseEntity.ok(openOrders);
     }
 
@@ -46,9 +43,6 @@ public class OpenOrderController {
     @PreAuthorize("hasAuthority('ADMIN')")
     public ResponseEntity<?> getAllOpenOrders() {
         var openOrders = openOrderService.getAllOpenOrders();
-        if (openOrders.isEmpty()) {
-            return ResponseEntity.status(404).body(List.of());
-        }
         return ResponseEntity.ok(openOrders);
     }
 

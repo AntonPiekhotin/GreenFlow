@@ -140,7 +140,7 @@ public class OpenOrderService {
         var foundOrder = redisTemplate.opsForValue().get(HASH_KEY_PREFIX + orderId);
         if (foundOrder == null) {
             log.error("Order with ID {} not found", orderId);
-            throw new GreenFlowException(404, "Order not found");
+            throw new GreenFlowException(400, "Order not found");
         }
         // send order assigned message to rabbitMQ, delete from redis
         try {

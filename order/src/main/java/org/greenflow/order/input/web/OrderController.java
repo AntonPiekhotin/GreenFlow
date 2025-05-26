@@ -43,7 +43,7 @@ public class OrderController {
     public ResponseEntity<?> getMyOrders(@RequestHeader(CustomHeaders.X_USER_ID) String clientId) {
         List<Order> orders = orderService.getOrdersByOwnerId(clientId);
         if (orders.isEmpty()) {
-            return ResponseEntity.status(404).body(Collections.emptyList());
+            return ResponseEntity.ok().body(Collections.emptyList());
         }
         return ResponseEntity.ok(orders);
     }

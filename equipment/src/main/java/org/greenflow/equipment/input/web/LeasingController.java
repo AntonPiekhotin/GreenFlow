@@ -35,9 +35,6 @@ public class LeasingController {
     @PreAuthorize("hasAuthority('WORKER')")
     public ResponseEntity<?> getLeasedEquipment(@RequestHeader(CustomHeaders.X_USER_ID) String userId) {
         List<EquipmentLease> equipment = leasingService.getLeasedEquipment(userId);
-        if (equipment.isEmpty())
-            return ResponseEntity.notFound().build();
-
         return ResponseEntity.ok(equipment);
     }
 

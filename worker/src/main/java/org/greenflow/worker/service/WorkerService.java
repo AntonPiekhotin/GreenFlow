@@ -58,7 +58,7 @@ public class WorkerService {
         Worker worker = workerRepository.findById(id).orElse(null);
         if (worker == null) {
             log.error("Worker not found in worker service: {}", id);
-            throw new GreenFlowException(404, "Worker not found for id: " + id);
+            throw new GreenFlowException(400, "Worker not found for id: " + id);
         }
         worker = WorkerMapper.INSTANCE.toEntity(workerDto);
         worker.setId(id);
