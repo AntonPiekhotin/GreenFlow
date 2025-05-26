@@ -10,7 +10,6 @@ public enum OrderStatus {
     CREATED("Created"),
     OPEN("Open"),
     ASSIGNED("Assigned"),
-    PAYMENT_PENDING("Payment Pending"),
     COMPLETED("Completed"),
     CANCELLED("Cancelled");
 

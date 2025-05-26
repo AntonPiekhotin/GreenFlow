@@ -63,4 +63,20 @@ public class RabbitMQConfig {
     public Binding orderAssignedBinding(@Qualifier("orderAssignedQueue") Queue queue, TopicExchange orderExchange) {
         return BindingBuilder.bind(queue).to(orderExchange).with("order.assigned.#");
     }
+
+    @Bean(name = "balanceExchange")
+    public TopicExchange balanceExchange() {
+        return new TopicExchange(RabbitMQConstants.BALANCE_EXCHANGE);
+    }
+
+    @Bean(name = "balanceChangeQueue")
+    public Queue balanceChangeQueue() {
+        return new Queue(RabbitMQConstants.BALANCE_CHANGE_QUEUE, true);
+    }
+
+    @Bean
+    public Binding balanceBinding(@Qualifier("balanceChangeQueue") Queue queue,
+                                  @Qualifier("balanceExchange") TopicExchange balanceExchange) {
+        return BindingBuilder.bind(queue).to(balanceExchange).with("balance.#");
+    }
 }

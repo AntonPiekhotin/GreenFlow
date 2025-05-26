@@ -121,4 +121,21 @@ public class OrderService {
         orderRepository.save(orderEntity);
         log.info("Order {} assigned to worker {}", orderMessage.getOrderId(), orderMessage.getWorkerId());
     }
+
+    public Order completeOrder(String workerId, String orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new GreenFlowException(400, "Order not found"));
+        if (!order.getStatus().equals(OrderStatus.ASSIGNED))
+            throw new GreenFlowException(400, "Order status is not ASSIGNED");
+        if (order.getWorkerId() == null)
+            throw new GreenFlowException(400, "Order does not have assigned worker");
+        if (!order.getWorkerId().equals(workerId))
+            throw new GreenFlowException(403, "No access to this resource!");
+        order.setStatus(OrderStatus.COMPLETED);
+        orderRepository.save(order);
+
+        rabbitMQProducer.sendBalanceUpdateMessagesForCompletedOrder(order);
+        log.info("Order {} completed by worker {}", orderId, workerId);
+        return order;
+    }
 }

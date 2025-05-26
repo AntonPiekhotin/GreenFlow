@@ -3,6 +3,7 @@ package org.greenflow.order.output.event;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.greenflow.common.model.constant.RabbitMQConstants;
+import org.greenflow.common.model.dto.event.BalanceChangeMessage;
 import org.greenflow.common.model.dto.event.OrderDeletionMessageDto;
 import org.greenflow.common.model.dto.event.OrderOpeningMessageDto;
 import org.greenflow.common.model.exception.GreenFlowException;
@@ -23,7 +24,7 @@ public class RabbitMQProducer {
     private final RabbitTemplate rabbitTemplate;
 
     // worker wage is 90% of the order total price
-    private static final BigDecimal WAGE_MULTIPLIER = BigDecimal.valueOf(0.9);
+    private static final BigDecimal WORKER_WAGE_MULTIPLIER = BigDecimal.valueOf(0.9);
 
     public void sendOrderOpeningMessage(Order order, String clientEmail) {
         if (!LocalDateTime.now().isAfter(order.getStartDate().atStartOfDay())) {
@@ -37,7 +38,7 @@ public class RabbitMQProducer {
                     .longitude(order.getLongitude())
                     .latitude(order.getLatitude())
                     .description(order.getDescription())
-                    .wage(order.getTotalPrice().multiply(WAGE_MULTIPLIER))
+                    .wage(order.getTotalPrice().multiply(WORKER_WAGE_MULTIPLIER))
                     .build();
             rabbitTemplate.convertAndSend(RabbitMQConstants.ORDER_EXCHANGE, RabbitMQConstants.ORDER_OPENING_QUEUE,
                     orderOpeningMessage);
@@ -61,4 +62,47 @@ public class RabbitMQProducer {
                     FAILED_TO_SEND_MESSAGE_TO_RABBIT_MQ, e);
         }
     }
+
+    /**
+     * Sends a message to RabbitMQ to change client and worker balances after completed order.
+     *
+     * @param order The order that has been completed.
+     */
+    public void sendBalanceUpdateMessagesForCompletedOrder(Order order) {
+        try {
+            //client balance
+            rabbitTemplate.convertAndSend(RabbitMQConstants.BALANCE_EXCHANGE, RabbitMQConstants.BALANCE_CHANGE_QUEUE,
+                    BalanceChangeMessage.builder()
+                            .userId(order.getClientId())
+                            .amount(order.getTotalPrice().negate())
+                            .build()
+            );
+            log.info("Balance change message sent to RabbitMQ for client: {}", order.getClientId());
+
+            //worker balance
+            rabbitTemplate.convertAndSend(RabbitMQConstants.BALANCE_EXCHANGE, RabbitMQConstants.BALANCE_CHANGE_QUEUE,
+                    BalanceChangeMessage.builder()
+                            .userId(order.getWorkerId())
+                            .amount(order.getTotalPrice().multiply(WORKER_WAGE_MULTIPLIER))
+                            .build()
+            );
+            log.info("Balance change message sent to RabbitMQ for worker: {}", order.getWorkerId());
+        } catch (Exception e) {
+            log.error("Failed to send order completed message to RabbitMQ", e);
+            throw new GreenFlowException(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    FAILED_TO_SEND_MESSAGE_TO_RABBIT_MQ, e);
+        }
+    }
+
+//    public void sendOrderCompletedNotification(Order order) {
+//        try {
+//            // send email to client
+//
+//            // send email to worker
+//        } catch (Exception e) {
+//            log.error("Failed to send order completed notification to RabbitMQ", e);
+//            throw new GreenFlowException(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+//                    FAILED_TO_SEND_MESSAGE_TO_RABBIT_MQ, e);
+//        }
+//    }
 }

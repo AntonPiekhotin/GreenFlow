@@ -64,4 +64,11 @@ public class OrderController {
         Order order = orderService.updateOrder(clientId, orderId, orderDto);
         return ResponseEntity.ok(order);
     }
+
+    @PostMapping("/complete/{orderId}")
+    @PreAuthorize("hasAuthority('WORKER')")
+    public ResponseEntity<?> completeOrder(@RequestHeader(CustomHeaders.X_USER_ID) String workerId,
+                                           @PathVariable String orderId) {
+        return ResponseEntity.ok(orderService.completeOrder(workerId, orderId));
+    }
 }
