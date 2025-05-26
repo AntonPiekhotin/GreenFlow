@@ -10,7 +10,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @Builder
@@ -18,6 +20,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class OrderDto {
+
+    String id;
 
     String clientId;
 
@@ -42,4 +46,8 @@ public class OrderDto {
     String workerId;
 
     String description;
+
+    List<OrderItemDto> orderItems;
+
+    BigDecimal totalPrice;
 }

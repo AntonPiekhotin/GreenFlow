@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.greenflow.common.model.constant.CustomHeaders;
 import org.greenflow.order.model.dto.OrderCreationDto;
+import org.greenflow.order.model.dto.OrderDto;
 import org.greenflow.order.model.dto.OrderUpdateDto;
 import org.greenflow.order.model.entity.Order;
 import org.greenflow.order.service.OrderService;
@@ -41,10 +42,7 @@ public class OrderController {
     @GetMapping("/my")
     @PreAuthorize("hasAuthority('CLIENT')")
     public ResponseEntity<?> getMyOrders(@RequestHeader(CustomHeaders.X_USER_ID) String clientId) {
-        List<Order> orders = orderService.getOrdersByOwnerId(clientId);
-        if (orders.isEmpty()) {
-            return ResponseEntity.ok().body(Collections.emptyList());
-        }
+        List<OrderDto> orders = orderService.getOrdersByOwnerId(clientId);
         return ResponseEntity.ok(orders);
     }
 
@@ -61,8 +59,13 @@ public class OrderController {
     public ResponseEntity<?> updateOrder(@RequestHeader(CustomHeaders.X_USER_ID) String clientId,
                                          @PathVariable String orderId,
                                          @RequestBody @Valid OrderUpdateDto orderDto) {
-        Order order = orderService.updateOrder(clientId, orderId, orderDto);
-        return ResponseEntity.ok(order);
+        return ResponseEntity.ok(orderService.updateOrder(clientId, orderId, orderDto));
+    }
+
+    @GetMapping("/assigned/my")
+    @PreAuthorize("hasAuthority('WORKER')")
+    public ResponseEntity<?> getMyAssignedOrders(@RequestHeader(CustomHeaders.X_USER_ID) String workerId) {
+        return ResponseEntity.ok(orderService.getAssignedOrdersByWorkerId(workerId));
     }
 
     @PostMapping("/complete/{orderId}")

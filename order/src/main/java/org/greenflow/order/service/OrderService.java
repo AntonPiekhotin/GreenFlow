@@ -9,6 +9,7 @@ import org.greenflow.common.model.dto.event.OrderAssignedMessageDto;
 import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.order.model.constant.OrderStatus;
 import org.greenflow.order.model.dto.OrderCreationDto;
+import org.greenflow.order.model.dto.OrderDto;
 import org.greenflow.order.model.dto.OrderUpdateDto;
 import org.greenflow.order.model.entity.Order;
 import org.greenflow.order.model.entity.OrderItem;
@@ -35,12 +36,11 @@ public class OrderService {
     private final ServiceRepository serviceRepository;
     private final RabbitMQProducer rabbitMQProducer;
 
-    public Order createOrder(@NotBlank String clientId, @NotBlank String clientEmail,
+    public OrderDto createOrder(@NotBlank String clientId, @NotBlank String clientEmail,
                              @Valid @NotNull OrderCreationDto orderDto) {
         Order order = OrderMapper.INSTANCE.toEntity(orderDto);
         order.setClientId(clientId);
         order.setStatus(OrderStatus.CREATED);
-        order = orderRepository.save(order);
         createOrderItems(order, orderDto);
         order.setTotalPrice(calculateTotalPrice(order));
 
@@ -50,7 +50,7 @@ public class OrderService {
         order = orderRepository.save(order);
 
         log.info("Client {} created order: {}", order.getClientId(), order.getId());
-        return order;
+        return OrderMapper.INSTANCE.toDto(order);
     }
 
     private Order createOrderItems(Order order, OrderCreationDto orderCreationDto) {
@@ -78,8 +78,10 @@ public class OrderService {
                         .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
-    public List<Order> getOrdersByOwnerId(@NotBlank String clientId) {
-        return orderRepository.findAllByClientId(clientId);
+    public List<OrderDto> getOrdersByOwnerId(@NotBlank String clientId) {
+        return orderRepository.findAllByClientId(clientId).stream()
+                .map(OrderMapper.INSTANCE::toDto)
+                .toList();
     }
 
     public void deleteOrder(@NotBlank String clientId, @NotBlank String orderId) {
@@ -95,7 +97,7 @@ public class OrderService {
         log.info("Client {} deleted order: {}", clientId, order.getId());
     }
 
-    public Order updateOrder(@NotBlank String userId, @NotBlank String orderId,
+    public OrderDto updateOrder(@NotBlank String userId, @NotBlank String orderId,
                              @NotNull @Valid OrderUpdateDto orderDto) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new GreenFlowException(HttpStatus.NOT_FOUND.value(), ORDER_NOT_FOUND_MESSAGE));
@@ -104,7 +106,11 @@ public class OrderService {
         }
         order.setStartDate(orderDto.getStartDate());
         order.setDescription(orderDto.getDescription());
-        return orderRepository.save(order);
+        orderRepository.save(order);
+
+        //send order update message
+
+        return OrderMapper.INSTANCE.toDto(order);
     }
 
     public void processOrderAssignedMessage(@NotNull OrderAssignedMessageDto orderMessage) {
@@ -122,7 +128,7 @@ public class OrderService {
         log.info("Order {} assigned to worker {}", orderMessage.getOrderId(), orderMessage.getWorkerId());
     }
 
-    public Order completeOrder(String workerId, String orderId) {
+    public OrderDto completeOrder(String workerId, String orderId) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new GreenFlowException(400, "Order not found"));
         if (!order.getStatus().equals(OrderStatus.ASSIGNED))
@@ -136,6 +142,12 @@ public class OrderService {
 
         rabbitMQProducer.sendBalanceUpdateMessagesForCompletedOrder(order);
         log.info("Order {} completed by worker {}", orderId, workerId);
-        return order;
+        return OrderMapper.INSTANCE.toDto(order);
+    }
+
+    public List<OrderDto> getAssignedOrdersByWorkerId(String workerId) {
+        return orderRepository.findAllByWorkerId(workerId).stream()
+                .map(OrderMapper.INSTANCE::toDto)
+                .toList();
     }
 }

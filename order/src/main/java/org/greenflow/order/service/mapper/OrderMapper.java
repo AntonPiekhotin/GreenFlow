@@ -7,7 +7,9 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
-@Mapper
+@Mapper(uses = {
+    OrderItemMapper.class
+})
 public interface OrderMapper {
 
     OrderMapper INSTANCE = Mappers.getMapper(OrderMapper.class);
@@ -16,7 +18,6 @@ public interface OrderMapper {
 
     Order toEntity(OrderDto orderDto);
 
-    @Mapping(target = "orderItems", ignore = true)
     Order toEntity(OrderCreationDto orderCreationDto);
 
 }

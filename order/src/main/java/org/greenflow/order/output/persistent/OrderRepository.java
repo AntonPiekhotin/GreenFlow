@@ -10,4 +10,6 @@ import java.util.List;
 public interface OrderRepository extends JpaRepository<Order, String> {
 
     List<Order> findAllByClientId(String clientId);
+
+    List<Order> findAllByWorkerId(String workerId);
 }
