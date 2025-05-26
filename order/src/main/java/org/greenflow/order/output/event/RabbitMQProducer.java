@@ -11,6 +11,7 @@ import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Service
@@ -20,6 +21,9 @@ public class RabbitMQProducer {
 
     public static final String FAILED_TO_SEND_MESSAGE_TO_RABBIT_MQ = "Failed to send message to RabbitMQ";
     private final RabbitTemplate rabbitTemplate;
+
+    // worker wage is 90% of the order total price
+    private static final BigDecimal WAGE_MULTIPLIER = BigDecimal.valueOf(0.9);
 
     public void sendOrderOpeningMessage(Order order, String clientEmail) {
         if (!LocalDateTime.now().isAfter(order.getStartDate().atStartOfDay())) {
@@ -33,6 +37,7 @@ public class RabbitMQProducer {
                     .longitude(order.getLongitude())
                     .latitude(order.getLatitude())
                     .description(order.getDescription())
+                    .wage(order.getTotalPrice().multiply(WAGE_MULTIPLIER))
                     .build();
             rabbitTemplate.convertAndSend(RabbitMQConstants.ORDER_EXCHANGE, RabbitMQConstants.ORDER_OPENING_QUEUE,
                     orderOpeningMessage);

@@ -19,6 +19,7 @@ import org.greenflow.order.service.mapper.OrderMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -41,6 +42,7 @@ public class OrderService {
         order.setStatus(OrderStatus.CREATED);
         order = orderRepository.save(order);
         createOrderItems(order, orderDto);
+        order.setTotalPrice(calculateTotalPrice(order));
 
         rabbitMQProducer.sendOrderOpeningMessage(order, clientEmail);
 
@@ -51,7 +53,7 @@ public class OrderService {
         return order;
     }
 
-    private void createOrderItems(Order order, OrderCreationDto orderCreationDto) {
+    private Order createOrderItems(Order order, OrderCreationDto orderCreationDto) {
         List<OrderItem> orderItems = new ArrayList<>();
         for (var itemDto : orderCreationDto.getOrderItems()) {
             OrderItem orderItem = new OrderItem();
@@ -64,8 +66,16 @@ public class OrderService {
             orderItems.add(orderItem);
         }
         order.setOrderItems(orderItems);
-        orderRepository.save(order);
-        log.info("Created {} order items for order {}", orderItems.size(), order.getId());
+        log.debug("Created {} order items for order {}", orderItems.size(), order.getId());
+        return order;
+    }
+
+    private static BigDecimal calculateTotalPrice(Order order) {
+        return order.getOrderItems() == null ? BigDecimal.ZERO :
+                order.getOrderItems().stream()
+                        .map(item -> item.getService().getPricePerUnit()
+                                .multiply(BigDecimal.valueOf(item.getQuantity())))
+                        .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 
     public List<Order> getOrdersByOwnerId(@NotBlank String clientId) {

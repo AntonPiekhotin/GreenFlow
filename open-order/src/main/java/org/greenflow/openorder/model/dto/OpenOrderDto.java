@@ -7,6 +7,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -22,5 +24,8 @@ public class OpenOrderDto {
     double latitude;
 
     String description;
+
+    // wage that worker will receive for this order
+    BigDecimal wage;
 
 }

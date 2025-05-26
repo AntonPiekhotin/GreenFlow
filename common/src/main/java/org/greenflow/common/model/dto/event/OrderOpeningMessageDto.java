@@ -9,6 +9,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.math.BigDecimal;
 
 @Data
 @Builder
@@ -28,4 +29,7 @@ public class OrderOpeningMessageDto implements Serializable {
     double latitude;
 
     String description;
+
+    // wage that worker will receive for this order
+    BigDecimal wage;
 }

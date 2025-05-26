@@ -17,7 +17,6 @@ spring:
 logging:
   level:
     org.greenflow: debug
-    root: debug
 
 api:
   internalApiToken: ${INTERNAL_API_TOKEN}
