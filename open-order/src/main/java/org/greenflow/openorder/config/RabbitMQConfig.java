@@ -21,7 +21,7 @@ public class RabbitMQConfig {
         SimpleRabbitListenerContainerFactory factory = new SimpleRabbitListenerContainerFactory();
         factory.setConnectionFactory(connectionFactory);
         SimpleMessageConverter converter = new SimpleMessageConverter();
-        converter.setAllowedListPatterns(List.of("org.greenflow.*"));
+        converter.setAllowedListPatterns(List.of("org.greenflow.*", "java.time.*", "java.math.*"));
         factory.setMessageConverter(converter);
         return factory;
     }
@@ -40,6 +40,17 @@ public class RabbitMQConfig {
     public Binding orderOpeningBinding(@Qualifier("orderOpeningQueue") Queue queue,
                                        TopicExchange orderExchange) {
         return BindingBuilder.bind(queue).to(orderExchange).with("order.opening.#");
+    }
+
+    @Bean(name = "orderUpdatingQueue")
+    public Queue orderUpdatingQueue() {
+        return new Queue(RabbitMQConstants.ORDER_UPDATING_QUEUE, true);
+    }
+
+    @Bean
+    public Binding orderUpdatingBinding(@Qualifier("orderUpdatingQueue") Queue queue,
+                                        TopicExchange orderExchange) {
+        return BindingBuilder.bind(queue).to(orderExchange).with("order.updating.#");
     }
 
     @Bean(name = "orderDeletionQueue")

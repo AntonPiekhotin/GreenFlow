@@ -17,7 +17,7 @@ import lombok.experimental.FieldDefaults;
 public class OrderItemCreationDto {
 
     @NotBlank
-    String serviceId;
+    Long serviceId;
 
     @NotNull
     @DecimalMin(value = "0.0", message = "Quantity must be greater than or equal to 0")

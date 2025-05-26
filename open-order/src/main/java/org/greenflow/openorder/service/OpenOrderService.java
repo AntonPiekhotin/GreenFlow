@@ -9,6 +9,7 @@ import org.greenflow.common.model.dto.EmailNotificationDto;
 import org.greenflow.common.model.dto.event.OrderAssignedMessageDto;
 import org.greenflow.common.model.dto.event.OrderDeletionMessageDto;
 import org.greenflow.common.model.dto.event.OrderOpeningMessageDto;
+import org.greenflow.common.model.dto.event.OrderUpdatingMessage;
 import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.openorder.model.dto.OpenOrderDto;
 import org.greenflow.openorder.model.dto.OpenOrdersRequestDto;
@@ -22,6 +23,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -123,6 +125,36 @@ public class OpenOrderService {
                 })
                 .filter(Objects::nonNull)
                 .toList();
+    }
+
+    public void updateOpenOrder(OrderUpdatingMessage updatedOrder) {
+        log.debug("Updating open order id: {}", updatedOrder.orderId());
+        String orderJson = redisTemplate.opsForValue().get(HASH_KEY_PREFIX + updatedOrder.orderId());
+        if (orderJson == null) {
+            log.error("Order with ID {} not found for update", updatedOrder.orderId());
+            throw new GreenFlowException(404, "Order not found");
+        }
+        try {
+            OpenOrderDto existingOrder = objectMapper.readValue(orderJson, OpenOrderDto.class);
+            // Update the existing order with new details
+
+            // Check if the start date is in the future
+            if (LocalDate.now().isBefore(updatedOrder.startDate())) {
+                deleteOpenOrderFromRedis(existingOrder.getOrderId());
+                return;
+            }
+            existingOrder.setDescription(updatedOrder.description());
+            existingOrder.setWage(updatedOrder.wage());
+
+            // Save the updated order back to Redis
+            redisTemplate.opsForValue().set(HASH_KEY_PREFIX + existingOrder.getOrderId(),
+                    objectMapper.writeValueAsString(existingOrder));
+            log.info("Updated open order with ID: {}", existingOrder.getOrderId());
+        } catch (JsonProcessingException e) {
+            log.error("Failed to update order with ID: {}", updatedOrder.orderId(), e);
+            throw new GreenFlowException(500, "Failed to update order", e);
+        }
+
     }
 
     public void deleteOpenOrder(OrderDeletionMessageDto order) {

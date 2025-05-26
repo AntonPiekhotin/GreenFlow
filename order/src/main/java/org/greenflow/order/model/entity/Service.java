@@ -27,8 +27,8 @@ import java.math.BigDecimal;
 public class Service {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
 
     @Column(nullable = false, unique = true)
     String name;

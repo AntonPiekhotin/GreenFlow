@@ -6,6 +6,7 @@ import org.greenflow.common.model.constant.RabbitMQConstants;
 import org.greenflow.common.model.dto.event.BalanceChangeMessage;
 import org.greenflow.common.model.dto.event.OrderDeletionMessageDto;
 import org.greenflow.common.model.dto.event.OrderOpeningMessageDto;
+import org.greenflow.common.model.dto.event.OrderUpdatingMessage;
 import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.order.model.entity.Order;
 import org.springframework.amqp.rabbit.core.RabbitTemplate;
@@ -43,6 +44,26 @@ public class RabbitMQProducer {
             rabbitTemplate.convertAndSend(RabbitMQConstants.ORDER_EXCHANGE, RabbitMQConstants.ORDER_OPENING_QUEUE,
                     orderOpeningMessage);
             log.info("Order opening message sent to RabbitMQ: {}", orderOpeningMessage.getOrderId());
+        } catch (Exception e) {
+            throw new GreenFlowException(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    FAILED_TO_SEND_MESSAGE_TO_RABBIT_MQ, e);
+        }
+    }
+
+    public void sendOrderUpdatingMessage(Order order) {
+        try {
+            var orderUpdatingMessage = OrderUpdatingMessage.builder()
+                    .orderId(order.getId())
+                    .startDate(order.getStartDate())
+                    .description(order.getDescription())
+                    .wage(order.getOrderItems().stream()
+                            .map(item -> item.getService().getPricePerUnit()
+                                    .multiply(BigDecimal.valueOf(item.getQuantity())))
+                            .reduce(BigDecimal.ZERO, BigDecimal::add).multiply(WORKER_WAGE_MULTIPLIER))
+                    .build();
+            rabbitTemplate.convertAndSend(RabbitMQConstants.ORDER_EXCHANGE, RabbitMQConstants.ORDER_UPDATING_QUEUE,
+                    orderUpdatingMessage);
+            log.info("Order updating message sent to RabbitMQ: {}", order.getId());
         } catch (Exception e) {
             throw new GreenFlowException(HttpStatus.INTERNAL_SERVER_ERROR.value(),
                     FAILED_TO_SEND_MESSAGE_TO_RABBIT_MQ, e);

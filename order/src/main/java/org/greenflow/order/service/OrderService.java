@@ -10,6 +10,7 @@ import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.order.model.constant.OrderStatus;
 import org.greenflow.order.model.dto.OrderCreationDto;
 import org.greenflow.order.model.dto.OrderDto;
+import org.greenflow.order.model.dto.OrderItemCreationDto;
 import org.greenflow.order.model.dto.OrderUpdateDto;
 import org.greenflow.order.model.entity.Order;
 import org.greenflow.order.model.entity.OrderItem;
@@ -21,6 +22,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,25 +39,25 @@ public class OrderService {
     private final RabbitMQProducer rabbitMQProducer;
 
     public OrderDto createOrder(@NotBlank String clientId, @NotBlank String clientEmail,
-                             @Valid @NotNull OrderCreationDto orderDto) {
+                                @Valid @NotNull OrderCreationDto orderDto) {
         Order order = OrderMapper.INSTANCE.toEntity(orderDto);
         order.setClientId(clientId);
-        order.setStatus(OrderStatus.CREATED);
-        createOrderItems(order, orderDto);
+        createOrderItems(order, orderDto.getOrderItems());
         order.setTotalPrice(calculateTotalPrice(order));
-
-        rabbitMQProducer.sendOrderOpeningMessage(order, clientEmail);
-
-        order.setStatus(OrderStatus.OPEN);
+        order.setStatus(OrderStatus.CREATED);
         order = orderRepository.save(order);
 
+        if (order.getStartDate().isEqual(LocalDate.now()) || order.getStartDate().isAfter(LocalDate.now())) {
+            order.setStatus(OrderStatus.OPEN);
+            rabbitMQProducer.sendOrderOpeningMessage(order, clientEmail);
+        }
         log.info("Client {} created order: {}", order.getClientId(), order.getId());
         return OrderMapper.INSTANCE.toDto(order);
     }
 
-    private Order createOrderItems(Order order, OrderCreationDto orderCreationDto) {
+    private Order createOrderItems(Order order, List<OrderItemCreationDto> orderItemDtos) {
         List<OrderItem> orderItems = new ArrayList<>();
-        for (var itemDto : orderCreationDto.getOrderItems()) {
+        for (var itemDto : orderItemDtos) {
             OrderItem orderItem = new OrderItem();
             orderItem.setOrder(order);
             orderItem.setService(serviceRepository.findById(itemDto.getServiceId()).orElseThrow(() ->
@@ -98,17 +100,28 @@ public class OrderService {
     }
 
     public OrderDto updateOrder(@NotBlank String userId, @NotBlank String orderId,
-                             @NotNull @Valid OrderUpdateDto orderDto) {
+                                @NotNull @Valid OrderUpdateDto orderDto) {
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new GreenFlowException(HttpStatus.NOT_FOUND.value(), ORDER_NOT_FOUND_MESSAGE));
         if (!order.getClientId().equals(userId)) {
-            throw new GreenFlowException(HttpStatus.FORBIDDEN.value(), FORBIDDEN_MESSAGE);
+            throw new GreenFlowException(403, FORBIDDEN_MESSAGE);
+        }
+        if (!order.getStatus().equals(OrderStatus.OPEN) && !order.getStatus().equals(OrderStatus.CREATED)) {
+            throw new GreenFlowException(400, "Order cannot be updated in its current state");
         }
         order.setStartDate(orderDto.getStartDate());
+        if (orderDto.getStartDate().isAfter(LocalDate.now()) || orderDto.getStartDate().isEqual(LocalDate.now())) {
+            order.setStatus(OrderStatus.OPEN);
+        } else if (orderDto.getStartDate().isBefore(LocalDate.now())) {
+            order.setStatus(OrderStatus.CREATED);
+        }
         order.setDescription(orderDto.getDescription());
+        createOrderItems(order, orderDto.getOrderItems());
+        order.setTotalPrice(calculateTotalPrice(order));
         orderRepository.save(order);
 
         //send order update message
+        rabbitMQProducer.sendOrderUpdatingMessage(order);
 
         return OrderMapper.INSTANCE.toDto(order);
     }

@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @FieldDefaults(level = lombok.AccessLevel.PRIVATE)
 public class ServiceDto {
 
-    String id;
+    Long id;
 
     String name;
 
