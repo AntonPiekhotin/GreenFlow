@@ -7,7 +7,6 @@ import org.greenflow.common.model.constant.CustomHeaders;
 import org.greenflow.order.model.dto.OrderCreationDto;
 import org.greenflow.order.model.dto.OrderDto;
 import org.greenflow.order.model.dto.OrderUpdateDto;
-import org.greenflow.order.model.entity.Order;
 import org.greenflow.order.service.OrderService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Collections;
 import java.util.List;
 
 @RestController

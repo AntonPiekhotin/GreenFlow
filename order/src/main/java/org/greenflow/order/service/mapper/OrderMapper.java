@@ -4,7 +4,6 @@ import org.greenflow.order.model.dto.OrderCreationDto;
 import org.greenflow.order.model.dto.OrderDto;
 import org.greenflow.order.model.entity.Order;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 import org.mapstruct.factory.Mappers;
 
 @Mapper(uses = {
