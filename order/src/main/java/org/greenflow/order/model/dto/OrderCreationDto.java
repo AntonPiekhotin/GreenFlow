@@ -1,5 +1,6 @@
 package org.greenflow.order.model.dto;
 
+import jakarta.validation.constraints.FutureOrPresent;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
@@ -36,6 +37,7 @@ public class OrderCreationDto {
     Double latitude;
 
     @NotNull(message = "Start date cannot be null")
+    @FutureOrPresent(message = "Start date must be today or in the future")
     LocalDate startDate;
 
     String description;
