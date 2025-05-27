@@ -47,7 +47,7 @@ public class OrderService {
         order.setStatus(OrderStatus.CREATED);
         order = orderRepository.save(order);
 
-        if (order.getStartDate().isEqual(LocalDate.now()) || order.getStartDate().isAfter(LocalDate.now())) {
+        if (order.getStartDate().isEqual(LocalDate.now()) || order.getStartDate().isBefore(LocalDate.now())) {
             order.setStatus(OrderStatus.OPEN);
             rabbitMQProducer.sendOrderOpeningMessage(order, clientEmail);
         }
