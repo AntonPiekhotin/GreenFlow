@@ -1,12 +1,16 @@
 package org.greenflow.notification.config;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.Properties;
+
+import static org.greenflow.common.model.constant.CustomHeaders.X_INTERNAL_TOKEN;
 
 @Configuration
 public class Config {
@@ -20,6 +24,8 @@ public class Config {
     @Value("${spring.mail.password}")
     private String password;
 
+    @Value("${api.internalApiToken}")
+    private String internalToken;
 
     @Bean
     public JavaMailSender getJavaMailSender() {
@@ -37,5 +43,15 @@ public class Config {
         props.put("mail.smtp.ssl.trust", "smtp.gmail.com");
 
         return mailSender;
+    }
+
+    @Bean
+    public RestTemplate restTemplate(RestTemplateBuilder builder) {
+        return builder
+                .additionalInterceptors((request, body, execution) -> {
+                    request.getHeaders().add(X_INTERNAL_TOKEN, internalToken);
+                    return execution.execute(request, body);
+                })
+                .build();
     }
 }

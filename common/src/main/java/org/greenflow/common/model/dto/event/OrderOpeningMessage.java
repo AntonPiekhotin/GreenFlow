@@ -16,7 +16,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class OrderOpeningMessageDto implements Serializable {
+public class OrderOpeningMessage implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 1131332095712355123L;

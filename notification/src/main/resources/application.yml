@@ -30,3 +30,6 @@ spring:
 logging:
   level:
     org.greenflow: debug
+
+api:
+  internalToken: ${INTERNAL_API_TOKEN}

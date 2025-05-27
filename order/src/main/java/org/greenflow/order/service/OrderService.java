@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.greenflow.common.model.dto.event.OrderAssignedMessageDto;
+import org.greenflow.common.model.dto.event.OrderAssignedMessage;
 import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.order.model.constant.OrderStatus;
 import org.greenflow.order.model.dto.OrderCreationDto;
@@ -126,7 +126,7 @@ public class OrderService {
         return OrderMapper.INSTANCE.toDto(order);
     }
 
-    public void processOrderAssignedMessage(@NotNull OrderAssignedMessageDto orderMessage) {
+    public void processOrderAssignedMessage(@NotNull OrderAssignedMessage orderMessage) {
         Order orderEntity = orderRepository.findById(orderMessage.getOrderId())
                 .orElseThrow(() -> new GreenFlowException(HttpStatus.NOT_FOUND.value(), ORDER_NOT_FOUND_MESSAGE));
         if (orderEntity.getWorkerId() != null && orderEntity.getWorkerId().equals(orderMessage.getWorkerId())) {

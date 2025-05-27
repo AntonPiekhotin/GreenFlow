@@ -1,6 +1,7 @@
 package org.greenflow.authservice.input.web;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.greenflow.authservice.model.dto.LoginRequest;
@@ -10,11 +11,13 @@ import org.greenflow.authservice.model.entity.User;
 import org.greenflow.authservice.service.AuthService;
 import org.greenflow.authservice.service.security.JwtService;
 import org.greenflow.common.model.dto.ResponseErrorDto;
+import org.greenflow.common.util.InternalAuth;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -62,5 +65,12 @@ public class AuthController {
                 .build();
         return ResponseEntity.status(201).body(response);
     }
+
+    @InternalAuth
+    @GetMapping("/email")
+    public String getUserEmail(@RequestParam("userId") @NotBlank String userId) {
+        return authService.getClientEmailFromAuthService(userId);
+    }
+
 
 }

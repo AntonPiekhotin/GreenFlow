@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.greenflow.common.model.constant.RabbitMQConstants;
 import org.greenflow.common.model.dto.event.BalanceChangeMessage;
-import org.greenflow.common.model.dto.event.OrderDeletionMessageDto;
-import org.greenflow.common.model.dto.event.OrderOpeningMessageDto;
+import org.greenflow.common.model.dto.event.OrderDeletionMessage;
+import org.greenflow.common.model.dto.event.OrderOpeningMessage;
 import org.greenflow.common.model.dto.event.OrderUpdatingMessage;
 import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.order.model.entity.Order;
@@ -32,7 +32,7 @@ public class RabbitMQProducer {
             return;
         }
         try {
-            var orderOpeningMessage = OrderOpeningMessageDto.builder()
+            var orderOpeningMessage = OrderOpeningMessage.builder()
                     .orderId(order.getId())
                     .clientId(order.getClientId())
                     .clientEmail(clientEmail)
@@ -72,7 +72,7 @@ public class RabbitMQProducer {
 
     public void sendOrderDeletionMessage(Order order) {
         try {
-            var orderDeletionMessage = OrderDeletionMessageDto.builder()
+            var orderDeletionMessage = OrderDeletionMessage.builder()
                     .orderId(order.getId())
                     .build();
             rabbitTemplate.convertAndSend(RabbitMQConstants.ORDER_EXCHANGE, RabbitMQConstants.ORDER_DELETION_QUEUE,

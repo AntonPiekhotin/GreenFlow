@@ -5,10 +5,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.greenflow.common.model.dto.EmailNotificationDto;
-import org.greenflow.common.model.dto.event.OrderAssignedMessageDto;
-import org.greenflow.common.model.dto.event.OrderDeletionMessageDto;
-import org.greenflow.common.model.dto.event.OrderOpeningMessageDto;
+import org.greenflow.common.model.dto.event.EmailNotificationMessage;
+import org.greenflow.common.model.dto.event.OrderAssignedMessage;
+import org.greenflow.common.model.dto.event.OrderDeletionMessage;
+import org.greenflow.common.model.dto.event.OrderOpeningMessage;
 import org.greenflow.common.model.dto.event.OrderUpdatingMessage;
 import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.openorder.model.dto.OpenOrderDto;
@@ -48,7 +48,7 @@ public class OpenOrderService {
      *
      * @param order The order to be saved, represented as an OrderOpeningMessageDto.
      */
-    public void saveOpenOrder(OrderOpeningMessageDto order) {
+    public void saveOpenOrder(OrderOpeningMessage order) {
         log.debug("Saving open order id: {}", order.getOrderId());
         // Add the order's geospatial data (latitude and longitude) to Redis.
         redisTemplate.opsForGeo()
@@ -157,7 +157,7 @@ public class OpenOrderService {
 
     }
 
-    public void deleteOpenOrder(OrderDeletionMessageDto order) {
+    public void deleteOpenOrder(OrderDeletionMessage order) {
         deleteOpenOrderFromRedis(order.getOrderId());
     }
 
@@ -176,7 +176,7 @@ public class OpenOrderService {
         }
         // send order assigned message to rabbitMQ, delete from redis
         try {
-            var orderAssignedMessage = OrderAssignedMessageDto.builder()
+            var orderAssignedMessage = OrderAssignedMessage.builder()
                     .orderId(orderId)
                     .workerId(workerId)
                     .build();
@@ -209,8 +209,8 @@ public class OpenOrderService {
     private void sendEmailToClient(String orderString) {
         try {
             log.debug("Sending email to client: {}", orderString);
-            OrderOpeningMessageDto order = objectMapper.readValue(orderString, OrderOpeningMessageDto.class);
-            rabbitMQProducer.sendEmailMessage(EmailNotificationDto.builder()
+            OrderOpeningMessage order = objectMapper.readValue(orderString, OrderOpeningMessage.class);
+            rabbitMQProducer.sendEmailMessage(EmailNotificationMessage.builder()
                             .to(order.getClientEmail())
                             .subject("Order Assigned")
                             .text("Your order with ID " + order.getOrderId() + " has been assigned to a worker.")

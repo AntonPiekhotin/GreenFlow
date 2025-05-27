@@ -2,7 +2,7 @@ package org.greenflow.order.input.event;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.greenflow.common.model.dto.event.OrderAssignedMessageDto;
+import org.greenflow.common.model.dto.event.OrderAssignedMessage;
 import org.greenflow.order.service.OrderService;
 import org.springframework.amqp.rabbit.annotation.RabbitListener;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ public class RabbitMQConsumer {
     private final OrderService orderService;
 
     @RabbitListener(queues = ORDER_ASSIGNED_QUEUE)
-    public void consumeOrderAssignedMessage(OrderAssignedMessageDto order) {
+    public void consumeOrderAssignedMessage(OrderAssignedMessage order) {
         orderService.processOrderAssignedMessage(order);
     }
 

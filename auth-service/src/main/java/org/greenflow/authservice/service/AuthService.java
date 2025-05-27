@@ -177,4 +177,11 @@ public class AuthService {
             log.error("Failed to save user in billing-service: {}", user.getEmail());
         }
     }
+
+    public String getClientEmailFromAuthService(String userId) {
+        log.debug("Fetching email for user ID: {}", userId);
+        return userRepository.findById(userId)
+                .map(User::getEmail)
+                .orElse(null);
+    }
 }

@@ -15,11 +15,11 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class OrderAssignedMessageDto implements Serializable {
+public class OrderDeletionMessage implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = -1028934567120934L;
+    private static final long serialVersionUID = 8913804712530981234L;
 
     String orderId;
-    String workerId;
+
 }
