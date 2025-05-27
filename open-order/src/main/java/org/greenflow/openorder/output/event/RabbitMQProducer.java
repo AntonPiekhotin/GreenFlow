@@ -33,7 +33,7 @@ public class RabbitMQProducer {
     public void sendEmailMessage(EmailNotificationMessage email) {
         try {
             rabbitTemplate.convertAndSend(NOTIFICATION_EXCHANGE, NOTIFICATION_QUEUE, email);
-            log.info("Email notification message sent to RabbitMQ: {}", email.to());
+            log.info("Email notification message sent to RabbitMQ: {}", email.userId());
         } catch (Exception e) {
             onError(e);
         }

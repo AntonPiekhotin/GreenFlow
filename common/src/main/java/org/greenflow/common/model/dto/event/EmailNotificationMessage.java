@@ -6,7 +6,7 @@ import java.io.Serial;
 import java.io.Serializable;
 
 @Builder
-public record EmailNotificationMessage(String to,
+public record EmailNotificationMessage(String userId,
                                        String subject,
                                        String text) implements Serializable {
     @Serial

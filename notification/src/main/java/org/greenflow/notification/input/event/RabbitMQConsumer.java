@@ -17,7 +17,7 @@ public class RabbitMQConsumer {
 
     @RabbitListener(queues = RabbitMQConstants.NOTIFICATION_QUEUE)
     public void consumeOrderOpeningMessage(EmailNotificationMessage email) {
-        log.info("Received email notification message to: {}", email.to());
+        log.info("Received email notification message to: {}", email.userId());
         try {
             emailService.sendEmail(email);
         } catch (Exception e) {

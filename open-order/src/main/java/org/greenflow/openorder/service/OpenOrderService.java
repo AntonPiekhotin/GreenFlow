@@ -211,7 +211,7 @@ public class OpenOrderService {
             log.debug("Sending email to client: {}", orderString);
             OrderOpeningMessage order = objectMapper.readValue(orderString, OrderOpeningMessage.class);
             rabbitMQProducer.sendEmailMessage(EmailNotificationMessage.builder()
-                            .to(order.getClientEmail())
+                            .userId(order.getClientId())
                             .subject("Order Assigned")
                             .text("Your order with ID " + order.getOrderId() + " has been assigned to a worker.")
                     .build());
