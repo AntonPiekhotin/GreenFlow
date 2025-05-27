@@ -18,7 +18,7 @@ public class OrdersScheduler {
     private final OrderRepository orderRepository;
     private final RabbitMQProducer rabbitMQProducer;
 
-    @Scheduled(fixedDelay = 10000) // Runs every 10 minutes
+    @Scheduled(fixedDelay = 600000) // Runs every 10 minutes
     public void scheduleOrderOpening() {
         log.info("Starting scheduled task to open orders");
         orderRepository.findAllCreatedOrders().forEach(

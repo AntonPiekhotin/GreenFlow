@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.greenflow.common.model.constant.RabbitMQConstants;
 import org.greenflow.common.model.dto.event.BalanceChangeMessage;
+import org.greenflow.common.model.dto.event.EmailNotificationMessage;
 import org.greenflow.common.model.dto.event.OrderDeletionMessage;
 import org.greenflow.common.model.dto.event.OrderOpeningMessage;
 import org.greenflow.common.model.dto.event.OrderUpdatingMessage;
@@ -115,15 +116,15 @@ public class RabbitMQProducer {
         }
     }
 
-//    public void sendOrderCompletedNotification(Order order) {
-//        try {
-//            // send email to client
-//
-//            // send email to worker
-//        } catch (Exception e) {
-//            log.error("Failed to send order completed notification to RabbitMQ", e);
-//            throw new GreenFlowException(HttpStatus.INTERNAL_SERVER_ERROR.value(),
-//                    FAILED_TO_SEND_MESSAGE_TO_RABBIT_MQ, e);
-//        }
-//    }
+    public void sendEmailNotification(EmailNotificationMessage message) {
+        try {
+            rabbitTemplate.convertAndSend(RabbitMQConstants.NOTIFICATION_EXCHANGE,
+                    RabbitMQConstants.NOTIFICATION_QUEUE, message);
+            log.info("Email notification message sent to RabbitMQ for user: {}", message.userId());
+        } catch (Exception e) {
+            log.error("Failed to send order completed notification to RabbitMQ", e);
+            throw new GreenFlowException(HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                    FAILED_TO_SEND_MESSAGE_TO_RABBIT_MQ, e);
+        }
+    }
 }

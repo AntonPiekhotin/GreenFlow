@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.greenflow.common.model.dto.event.EmailNotificationMessage;
 import org.greenflow.common.model.dto.event.OrderAssignedMessage;
 import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.order.model.constant.OrderStatus;
@@ -154,9 +155,62 @@ public class OrderService {
         orderRepository.save(order);
 
         rabbitMQProducer.sendBalanceUpdateMessagesForCompletedOrder(order);
+        sendInvoiceToClient(order);
+
         log.info("Order {} completed by worker {}", orderId, workerId);
         return OrderMapper.INSTANCE.toDto(order);
     }
+
+    private void sendInvoiceToClient(Order order) {
+        EmailNotificationMessage msg = new EmailNotificationMessage(
+                order.getClientId(),
+                "Your invoice and certificate of completed work — order " + order.getId(),
+                buildInvoiceText(order)
+        );
+        rabbitMQProducer.sendEmailNotification(msg);
+    }
+
+    private String buildInvoiceText(Order order) {
+        StringBuilder sb = new StringBuilder();
+
+        sb.append("Invoice №").append(order.getId())
+                .append("\nDate: ").append(LocalDate.now())
+                .append("\n\n");
+
+        sb.append("Order ID: ").append(order.getId()).append("\n\n");
+        sb.append("Garden ID: ").append(order.getGardenId()).append("\n\n");
+
+        sb.append("List of services:\n");
+        List<OrderItem> items = order.getOrderItems();
+        for (int i = 0; i < items.size(); i++) {
+            OrderItem it = items.get(i);
+            String name = it.getService().getName();
+            String unit = it.getService().getUnit();
+            BigDecimal unitPrice = it.getService().getPricePerUnit();
+            double qty = it.getQuantity();
+            BigDecimal lineTotal = unitPrice.multiply(BigDecimal.valueOf(qty));
+
+            sb.append(i + 1).append(". ")
+                    .append(name).append(" — ")
+                    .append(qty).append(" ").append(unit)
+                    .append(" × ").append(unitPrice).append(" = ")
+                    .append(lineTotal).append(" EUR.\n");
+        }
+        sb.append("\nTotal cost: ")
+                .append(order.getTotalPrice()).append(" EUR.\n\n");
+
+        sb.append("Work completion certificate:\n")
+                .append("— Date start: ").append(order.getStartDate()).append("\n")
+                .append("— Date end: ").append(LocalDate.now()).append("\n");
+        if (order.getDescription() != null) {
+            sb.append("— Description: ").append(order.getDescription()).append("\n");
+        }
+        sb.append("\nThank you for your cooperation!");
+        sb.append("\nGreenFlow Team");
+
+        return sb.toString();
+    }
+
 
     public List<OrderDto> getAssignedOrdersByWorkerId(String workerId) {
         return orderRepository.findAllByWorkerId(workerId).stream()
