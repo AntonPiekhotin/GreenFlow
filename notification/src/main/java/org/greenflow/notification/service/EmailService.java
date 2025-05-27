@@ -19,11 +19,12 @@ public class EmailService {
     public void sendEmail(EmailNotificationMessage email) {
         log.debug("Sending email to: {}", email.userId());
         SimpleMailMessage message = new SimpleMailMessage();
-        message.setTo(getEmail(email.userId()));
+        String emailAddress = getEmail(email.userId());
+        message.setTo(emailAddress);
         message.setSubject(email.subject());
         message.setText(email.text());
         mailSender.send(message);
-        log.debug("Email sent to: {}", email.userId());
+        log.debug("Email sent to: {}", emailAddress);
     }
 
     private String getEmail(String userId) {

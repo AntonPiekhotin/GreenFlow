@@ -32,4 +32,6 @@ logging:
     org.greenflow: debug
 
 api:
-  internalToken: ${INTERNAL_API_TOKEN}
+  internalApiToken: ${INTERNAL_API_TOKEN}
+  host:
+    auth-service: ${AUTH_SERVICE_HOST}
