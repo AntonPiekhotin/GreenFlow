@@ -1,5 +1,6 @@
 package org.greenflow.garden.service;
 
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.greenflow.common.model.exception.GreenFlowException;
@@ -8,16 +9,18 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class S3Uploader {
+public class S3ImageService {
 
     private final S3Client s3Client;
     private final String bucketName = "greenflow-images";
@@ -53,5 +56,15 @@ public class S3Uploader {
         s3Client.putObject(putObjectRequest, RequestBody.fromInputStream(inputStream, contentLength));
 
         return String.format("%s/%s/%s", SPACES_URI, bucketName, fileName);
+    }
+
+    public void deleteImage(@NotBlank String imageUrl) {
+        String key = URI.create(imageUrl).getPath().substring(1);
+        DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build();
+
+        s3Client.deleteObject(deleteRequest);
     }
 }

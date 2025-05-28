@@ -1,9 +1,12 @@
 package org.greenflow.garden.service;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.greenflow.common.model.exception.GreenFlowException;
+import org.greenflow.garden.model.dto.DeleteImageRequest;
 import org.greenflow.garden.model.dto.GardenDto;
 import org.greenflow.garden.model.entity.Garden;
 import org.greenflow.garden.output.persistent.GardenRepository;
@@ -11,7 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -20,7 +22,7 @@ import java.util.List;
 public class GardenService {
 
     private final GardenRepository gardenRepository;
-    private final S3Uploader s3Uploader;
+    private final S3ImageService s3ImageService;
 
     public List<Garden> getGardensByOwnerId(String ownerId) {
         return gardenRepository.findAllByOwnerId(ownerId);
@@ -78,19 +80,33 @@ public class GardenService {
         return gardenRepository.save(garden);
     }
 
-    public String addImageToGarden(String userId, String gardenId, MultipartFile imageFile) {
-        Garden garden = gardenRepository.findById(Long.valueOf(gardenId))
+    public String addImageToGarden(String userId, @NotNull Long gardenId, @NotNull MultipartFile imageFile) {
+        Garden garden = gardenRepository.findById(gardenId)
                 .orElseThrow(() -> new GreenFlowException(HttpStatus.NOT_FOUND.value(), "Garden not found"));
         if (!garden.getOwnerId().equals(userId)) {
             throw new GreenFlowException(403, "You do not have access to this resource");
         }
-        if (imageFile == null || imageFile.isEmpty()) {
-            throw new GreenFlowException(HttpStatus.BAD_REQUEST.value(), "Image file cannot be null or empty");
-        }
-        String imageUrl = s3Uploader.uploadImage(imageFile);
+        String imageUrl = s3ImageService.uploadImage(imageFile);
         garden.getImagesUrl().add(imageUrl);
         gardenRepository.save(garden);
         log.info("Client {} added image to garden {}: {}", userId, gardenId, imageUrl);
         return imageUrl;
+    }
+
+    public boolean deleteImageFromGarden(String userId, @Valid DeleteImageRequest deleteImageRequest) {
+        Long gardenId = deleteImageRequest.gardenId();
+        String imageUrl = deleteImageRequest.imageUrl();
+        Garden garden = gardenRepository.findById(gardenId)
+                .orElseThrow(() -> new GreenFlowException(HttpStatus.NOT_FOUND.value(), "Garden not found"));
+        if (!garden.getOwnerId().equals(userId)) {
+            throw new GreenFlowException(403, "You do not have access to this resource");
+        }
+        if (!garden.getImagesUrl().remove(imageUrl)) {
+            throw new GreenFlowException(400, "Image not found in garden");
+        }
+        gardenRepository.save(garden);
+        s3ImageService.deleteImage(imageUrl);
+        log.info("Client {} deleted image from garden {}: {}", userId, gardenId, imageUrl);
+        return true;
     }
 }
