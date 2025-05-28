@@ -9,7 +9,9 @@ import org.greenflow.garden.model.entity.Garden;
 import org.greenflow.garden.output.persistent.GardenRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -18,6 +20,7 @@ import java.util.List;
 public class GardenService {
 
     private final GardenRepository gardenRepository;
+    private final S3Uploader s3Uploader;
 
     public List<Garden> getGardensByOwnerId(String ownerId) {
         return gardenRepository.findAllByOwnerId(ownerId);
@@ -73,5 +76,21 @@ public class GardenService {
         garden.setLongitude(gardenDto.getLongitude());
         garden.setDescription(gardenDto.getDescription());
         return gardenRepository.save(garden);
+    }
+
+    public String addImageToGarden(String userId, String gardenId, MultipartFile imageFile) {
+        Garden garden = gardenRepository.findById(Long.valueOf(gardenId))
+                .orElseThrow(() -> new GreenFlowException(HttpStatus.NOT_FOUND.value(), "Garden not found"));
+        if (!garden.getOwnerId().equals(userId)) {
+            throw new GreenFlowException(403, "You do not have access to this resource");
+        }
+        if (imageFile == null || imageFile.isEmpty()) {
+            throw new GreenFlowException(HttpStatus.BAD_REQUEST.value(), "Image file cannot be null or empty");
+        }
+        String imageUrl = s3Uploader.uploadImage(imageFile);
+        garden.getImagesUrl().add(imageUrl);
+        gardenRepository.save(garden);
+        log.info("Client {} added image to garden {}: {}", userId, gardenId, imageUrl);
+        return imageUrl;
     }
 }

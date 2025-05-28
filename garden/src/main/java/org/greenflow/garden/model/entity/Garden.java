@@ -18,6 +18,7 @@ import org.greenflow.garden.model.dto.GardenDto;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.proxy.HibernateProxy;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -52,7 +53,7 @@ public class Garden {
     String description;
 
     @ElementCollection
-    List<String> imagesUrl;
+    List<String> imagesUrl = new ArrayList<>();
 
     @CreationTimestamp
     Date createdAt;

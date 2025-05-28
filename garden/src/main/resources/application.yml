@@ -16,3 +16,10 @@ spring:
 logging:
   level:
     org.greenflow: DEBUG
+
+api:
+  spaces:
+    access-key: ${SPACES_ACCESS_KEY}
+    secret-key: ${SPACES_SECRET_KEY}
+    uri: ${SPACES_URI}
+    region: ${SPACES_REGION}

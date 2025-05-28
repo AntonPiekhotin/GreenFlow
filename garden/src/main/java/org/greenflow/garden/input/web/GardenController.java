@@ -6,6 +6,7 @@ import org.greenflow.common.model.constant.CustomHeaders;
 import org.greenflow.garden.model.dto.GardenDto;
 import org.greenflow.garden.model.entity.Garden;
 import org.greenflow.garden.service.GardenService;
+import org.greenflow.garden.service.S3Uploader;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -16,9 +17,13 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/garden")
@@ -57,6 +62,14 @@ public class GardenController {
                                           @RequestBody @Valid GardenDto gardenDto) {
         Garden garden = gardenService.updateGarden(userId, gardenId, gardenDto);
         return ResponseEntity.ok(garden);
+    }
+
+    @PostMapping("/images")
+    @PreAuthorize("hasAuthority('CLIENT')")
+    public ResponseEntity<?> uploadImage(@RequestHeader(CustomHeaders.X_USER_ID) String userId,
+                                         @RequestParam("file") MultipartFile imageFile,
+                                         @RequestParam("gardenId") String gardenId) {
+        return ResponseEntity.ok(gardenService.addImageToGarden(userId, gardenId, imageFile));
     }
 
 }
