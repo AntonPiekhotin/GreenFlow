@@ -23,9 +23,11 @@ public class EquipmentService {
     private final EquipmentRepository equipmentRepository;
     private final WarehouseRepository warehouseRepository;
 
-    public Equipment createEquipment(@Valid Equipment equipment, @NotBlank String warehouseId) {
-        equipment.setWarehouse(warehouseRepository.findById(warehouseId).orElseThrow( () ->
-                new GreenFlowException(400, "Warehouse with id " + warehouseId + " does not exist")));
+    public Equipment createEquipment(@Valid Equipment equipment, @NotBlank Long warehouseId) {
+        if (!warehouseRepository.existsById(warehouseId)) {
+            throw new GreenFlowException(400, "Warehouse with id " + warehouseId + " does not exist");
+        }
+        equipment.setWarehouseId(warehouseId);
         return equipmentRepository.save(equipment);
     }
 
@@ -34,7 +36,7 @@ public class EquipmentService {
                 .orElseThrow(() -> new GreenFlowException(400, "Equipment with id " + id + " does not exist"));
     }
 
-    public List<Equipment> getEquipmentByWarehouseId(@NotBlank String warehouseId) {
+    public List<Equipment> getEquipmentByWarehouseId(@NotBlank Long warehouseId) {
         if (!warehouseRepository.existsById(warehouseId)) {
             throw new GreenFlowException(400, "Warehouse with id " + warehouseId + " does not exist");
         }
@@ -45,10 +47,7 @@ public class EquipmentService {
         Equipment existingEquipment = equipmentRepository.findById(id)
                 .orElseThrow(() -> new GreenFlowException(400, "Equipment with id " + id + " does not exist"));
         equipment.setId(id);
-        equipment.setWarehouse(warehouseRepository.findById(existingEquipment.getWarehouse().getId())
-                .orElseThrow( () ->  new GreenFlowException(400,
-                        "Warehouse with id " + existingEquipment.getWarehouse().getId() + " does not exist"))
-        );
+        equipment.setWarehouseId(existingEquipment.getWarehouseId());
         return equipmentRepository.save(equipment);
     }
 

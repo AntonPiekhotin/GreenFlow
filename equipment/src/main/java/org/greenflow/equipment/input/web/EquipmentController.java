@@ -30,7 +30,7 @@ public class EquipmentController {
     @PostMapping
     @PreAuthorize("hasAuthority('MANAGER')")
     public ResponseEntity<?> createEquipment(@RequestBody @Valid Equipment equipment,
-                                             @RequestParam("warehouseId") String warehouseId) {
+                                             @RequestParam("warehouseId") Long warehouseId) {
         return ResponseEntity.status(201).body(equipmentService.createEquipment(equipment, warehouseId));
     }
 
@@ -42,7 +42,7 @@ public class EquipmentController {
 
     @GetMapping
     @PreAuthorize("hasAnyAuthority('WORKER', 'MANAGER')")
-    public ResponseEntity<?> getEquipmentByWarehouseId(@RequestParam("warehouseId") String warehouseId) {
+    public ResponseEntity<?> getEquipmentByWarehouseId(@RequestParam("warehouseId") Long warehouseId) {
         return ResponseEntity.ok(equipmentService.getEquipmentByWarehouseId(warehouseId));
     }
     

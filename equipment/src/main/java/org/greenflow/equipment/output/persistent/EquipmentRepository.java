@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface EquipmentRepository extends MongoRepository<Equipment, String> {
 
-    List<Equipment> findAllByWarehouseId(String warehouseId);
+    List<Equipment> findAllByWarehouseId(Long warehouseId);
 
     List<Equipment> findAllByLeasedBy(String leasedBy);
 }

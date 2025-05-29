@@ -35,7 +35,7 @@ public class WarehouseController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> updateWarehouse(@PathVariable String id, @RequestBody @Valid WarehouseUpdateDto warehouse) {
+    public ResponseEntity<?> updateWarehouse(@PathVariable Long id, @RequestBody @Valid WarehouseUpdateDto warehouse) {
         return ResponseEntity.ok(warehouseService.updateWarehouse(id, warehouse));
     }
 
