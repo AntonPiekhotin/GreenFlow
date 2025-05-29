@@ -63,15 +63,13 @@ public class EquipmentController {
     @GetMapping("/search")
     @PreAuthorize("hasAuthority('WORKER')")
     public ResponseEntity<List<Equipment>> findNearby(
-            @RequestHeader(CustomHeaders.X_USER_ID) String userId,
             @RequestHeader("X-User-Latitude") Double lat,
             @RequestHeader("X-User-Longitude") Double lon,
-            @RequestParam(defaultValue = "5") Double radiusKm,
-            @RequestParam(defaultValue = "dailyLeasingPrice") EquipmentSortBy sortBy,
-            @RequestParam(defaultValue = "asc") EquipmentSortBy.SortDirection sortDirection
+            @RequestParam("radiusKm") Double radiusKm,
+            @RequestParam("sortBy") EquipmentSortBy sortBy,
+            @RequestParam("sortDirection") EquipmentSortBy.SortDirection sortDirection
     ) {
-        var equipment = equipmentService.findAvailableNear(
-                lat, lon, radiusKm, sortBy, sortDirection);
+        var equipment = equipmentService.findAvailableNear(lat, lon, radiusKm, sortBy, sortDirection);
         return ResponseEntity.ok(equipment);
     }
 

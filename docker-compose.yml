@@ -115,6 +115,7 @@ services:
     image: bitnami/postgresql:16.1.0-debian-11-r25
     container_name: leasing-db
     volumes:
+      - ./db-init/leasing-db.sql:/docker-entrypoint-initdb.d/leasing-db.sql
       - pg_data:/var/lib/postgresql/data
     environment:
       POSTGRES_USER: postgres
