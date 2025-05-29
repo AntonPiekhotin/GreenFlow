@@ -6,6 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.greenflow.common.model.dto.event.BalanceChangeMessage;
 import org.greenflow.common.model.exception.GreenFlowException;
+import org.greenflow.equipment.model.constant.EquipmentStatus;
 import org.greenflow.equipment.model.constant.LeasingStatus;
 import org.greenflow.equipment.model.entity.Equipment;
 import org.greenflow.equipment.model.entity.EquipmentLease;
@@ -32,9 +33,7 @@ public class LeasingService {
         log.debug("request lease equipment {} from worker {}", equipmentId, lesseeId);
         Equipment equipment = equipmentRepository.findById(equipmentId)
                 .orElseThrow(() -> new GreenFlowException(400, "Equipment not found"));
-        if (equipment.getStatus() != null &&
-                (equipment.getStatus().equals(LeasingStatus.ACTIVE)
-                        || equipment.getStatus().equals(LeasingStatus.PENDING))) {
+        if (equipment.getStatus() != EquipmentStatus.AVAILABLE) {
             throw new GreenFlowException(400, "Equipment is already leased");
         }
         EquipmentLease lease = EquipmentLease.builder()
@@ -47,7 +46,7 @@ public class LeasingService {
         equipmentLeaseRepository.save(lease);
         log.info("Lease request created with id {} for worker {}", lease.getId(), lease.getLesseeId());
 
-        equipment.setStatus(LeasingStatus.PENDING);
+        equipment.setStatus(EquipmentStatus.PENDING);
         equipment.setLeasedBy(lesseeId);
         equipmentRepository.save(equipment);
         log.info("Equipment {} is now pending for lease", equipmentId);
@@ -83,7 +82,7 @@ public class LeasingService {
         lease.setEndDate(LocalDateTime.now());
 
         equipment.setLeasedBy(null);
-        equipment.setStatus(null);
+        equipment.setStatus(EquipmentStatus.AVAILABLE);
         equipmentRepository.save(equipment);
 
         changeWorkerBalance(lease);

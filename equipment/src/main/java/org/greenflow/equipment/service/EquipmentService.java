@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.greenflow.common.model.exception.GreenFlowException;
+import org.greenflow.equipment.model.constant.EquipmentSortBy;
 import org.greenflow.equipment.model.constant.LeasingStatus;
 import org.greenflow.equipment.model.entity.Equipment;
 import org.greenflow.equipment.model.entity.Warehouse;
@@ -59,19 +60,16 @@ public class EquipmentService {
     }
 
     public List<Equipment> findAvailableNear(Double lat, Double lon, Double radiusKm,
-                                             String sortBy, String sortDir) {
-        // 1) Знаходимо склади в радіусі (у метрах)
-        double radiusM = radiusKm * 1_000;
-        List<Warehouse> nearby = warehouseRepository.findWithinRadius(lat, lon, radiusM);
+                                             EquipmentSortBy sortBy, EquipmentSortBy.SortDirection sortDir) {
+        double radiusMeters = radiusKm * 1_000;
+        List<Warehouse> nearby = warehouseRepository.findWithinRadius(lat, lon, radiusMeters);
         List<Long> warehouseIds = nearby.stream()
                 .map(Warehouse::getId)
                 .toList();
 
-        // 2) Формуємо об’єкт Sort
-        Sort.Direction direction = Sort.Direction.fromString(sortDir);
-        Sort sort = Sort.by(direction, sortBy);
+        Sort.Direction direction = Sort.Direction.fromString(sortDir.name());
+        Sort sort = Sort.by(direction, sortBy.getFieldName());
 
-        // 3) Запит по обладнанню з сортуванням
         return equipmentRepository
                 .findByWarehouse_IdInAndStatus(warehouseIds, LeasingStatus.AVAILABLE, sort)
                 .stream()

@@ -9,9 +9,11 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
 import lombok.Setter;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
+import org.greenflow.equipment.model.constant.EquipmentStatus;
 import org.greenflow.equipment.model.constant.LeasingStatus;
 import org.greenflow.equipment.model.entity.types.Lawnmower;
 import org.springframework.data.annotation.Id;
@@ -36,7 +38,8 @@ public abstract class Equipment {
     @Id
     String id;
 
-    LeasingStatus status = LeasingStatus.AVAILABLE;
+    @NonNull
+    EquipmentStatus status = EquipmentStatus.AVAILABLE;
 
     String leasedBy;
 

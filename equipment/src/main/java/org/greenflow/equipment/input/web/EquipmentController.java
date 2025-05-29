@@ -3,6 +3,7 @@ package org.greenflow.equipment.input.web;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.greenflow.common.model.constant.CustomHeaders;
+import org.greenflow.equipment.model.constant.EquipmentSortBy;
 import org.greenflow.equipment.model.entity.Equipment;
 import org.greenflow.equipment.service.EquipmentService;
 import org.springframework.http.ResponseEntity;
@@ -66,11 +67,11 @@ public class EquipmentController {
             @RequestHeader("X-User-Latitude") Double lat,
             @RequestHeader("X-User-Longitude") Double lon,
             @RequestParam(defaultValue = "5") Double radiusKm,
-            @RequestParam(defaultValue = "dailyLeasingPrice") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDir
+            @RequestParam(defaultValue = "dailyLeasingPrice") EquipmentSortBy sortBy,
+            @RequestParam(defaultValue = "asc") EquipmentSortBy.SortDirection sortDirection
     ) {
         var equipment = equipmentService.findAvailableNear(
-                lat, lon, radiusKm, sortBy, sortDir);
+                lat, lon, radiusKm, sortBy, sortDirection);
         return ResponseEntity.ok(equipment);
     }
 
