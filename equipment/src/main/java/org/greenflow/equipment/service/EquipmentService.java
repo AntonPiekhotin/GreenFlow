@@ -71,7 +71,7 @@ public class EquipmentService {
         Sort sort = Sort.by(direction, sortBy.getFieldName());
 
         return equipmentRepository
-                .findByWarehouse_IdInAndStatus(warehouseIds, LeasingStatus.AVAILABLE, sort)
+                .findByWarehouseIdInAndStatus(warehouseIds, LeasingStatus.AVAILABLE, sort)
                 .stream()
                 .toList();
     }

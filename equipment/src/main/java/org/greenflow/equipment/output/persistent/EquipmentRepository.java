@@ -15,9 +15,10 @@ public interface EquipmentRepository extends MongoRepository<Equipment, String> 
 
     List<Equipment> findAllByLeasedBy(String leasedBy);
 
-    List<Equipment> findByWarehouse_IdInAndStatus(
+    List<Equipment> findByWarehouseIdInAndStatus(
             List<Long> warehouseIds,
             LeasingStatus status,
             Sort sort
     );
+
 }

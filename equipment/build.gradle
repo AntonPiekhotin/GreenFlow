@@ -37,7 +37,7 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
 	implementation 'org.springframework.boot:spring-boot-starter-amqp'
 	testImplementation 'org.springframework.amqp:spring-rabbit-test'
-	implementation 'org.hibernate.orm:hibernate-spatial:7.0.0.Final'
+	implementation 'org.hibernate.orm:hibernate-spatial:6.2.7.Final'
 
 	//mapstruct + lombok
 	implementation 'org.mapstruct:mapstruct:1.6.3'
