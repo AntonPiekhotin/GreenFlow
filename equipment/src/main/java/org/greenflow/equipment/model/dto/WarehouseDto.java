@@ -18,8 +18,7 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class WarehouseDto {
 
-    @NotBlank
-    String id;
+    Long id;
 
     @NotBlank
     String name;

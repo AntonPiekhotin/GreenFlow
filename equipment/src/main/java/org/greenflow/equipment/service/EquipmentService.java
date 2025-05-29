@@ -5,9 +5,12 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.greenflow.common.model.exception.GreenFlowException;
+import org.greenflow.equipment.model.constant.LeasingStatus;
 import org.greenflow.equipment.model.entity.Equipment;
+import org.greenflow.equipment.model.entity.Warehouse;
 import org.greenflow.equipment.output.persistent.EquipmentRepository;
 import org.greenflow.equipment.output.persistent.WarehouseRepository;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -56,4 +59,23 @@ public class EquipmentService {
         equipmentRepository.deleteById(id);
     }
 
+    public List<Equipment> findAvailableNear(Double lat, Double lon, Double radiusKm,
+                                             String sortBy, String sortDir) {
+        // 1) Знаходимо склади в радіусі (у метрах)
+        double radiusM = radiusKm * 1_000;
+        List<Warehouse> nearby = warehouseRepository.findWithinRadius(lat, lon, radiusM);
+        List<Long> warehouseIds = nearby.stream()
+                .map(Warehouse::getId)
+                .toList();
+
+        // 2) Формуємо об’єкт Sort
+        Sort.Direction direction = Sort.Direction.fromString(sortDir);
+        Sort sort = Sort.by(direction, sortBy);
+
+        // 3) Запит по обладнанню з сортуванням
+        return equipmentRepository
+                .findByWarehouse_IdInAndStatus(warehouseIds, LeasingStatus.AVAILABLE, sort)
+                .stream()
+                .toList();
+    }
 }

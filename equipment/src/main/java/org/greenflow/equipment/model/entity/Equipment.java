@@ -36,15 +36,14 @@ public abstract class Equipment {
     @Id
     String id;
 
-    LeasingStatus status;
+    LeasingStatus status = LeasingStatus.AVAILABLE;
 
     String leasedBy;
 
     @NotNull
     BigDecimal dailyLeasingPrice;
 
-    @DocumentReference
-    Warehouse warehouse;
+    Long warehouseId;
 
     @NotBlank
     String name;

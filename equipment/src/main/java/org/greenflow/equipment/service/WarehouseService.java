@@ -27,13 +27,13 @@ public class WarehouseService {
         return WarehouseMapper.INSTANCE.toDto(warehouse);
     }
 
-    public WarehouseDto getWarehouse(@NotBlank String id) {
+    public WarehouseDto getWarehouse(@NotBlank Long id) {
         Warehouse warehouse = warehouseRepository.findById(id)
                 .orElseThrow(() -> new GreenFlowException(400, "Warehouse with id " + id + " does not exist"));
         return WarehouseMapper.INSTANCE.toDto(warehouse);
     }
 
-    public WarehouseDto updateWarehouse(@NotBlank String id, @NotNull @Valid WarehouseUpdateDto warehouseUpdateDto) {
+    public WarehouseDto updateWarehouse(@NotBlank Long id, @NotNull @Valid WarehouseUpdateDto warehouseUpdateDto) {
         if (!warehouseRepository.existsById(id)) {
             throw new GreenFlowException(400, "Warehouse with id " + id + " does not exist");
         }
@@ -42,7 +42,7 @@ public class WarehouseService {
         return WarehouseMapper.INSTANCE.toDto(warehouseRepository.save(updatedWarehouse));
     }
 
-    public void deleteWarehouseById(@NotBlank String id) {
+    public void deleteWarehouseById(@NotBlank Long id) {
         if (!warehouseRepository.existsById(id)) {
             throw new GreenFlowException(400, "Warehouse with id " + id + " does not exist");
         }

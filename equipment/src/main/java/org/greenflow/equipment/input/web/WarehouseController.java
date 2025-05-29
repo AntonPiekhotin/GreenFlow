@@ -30,7 +30,7 @@ public class WarehouseController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getWarehouse(@PathVariable String id) {
+    public ResponseEntity<?> getWarehouse(@PathVariable Long id) {
         return ResponseEntity.ok(warehouseService.getWarehouse(id));
     }
 
@@ -40,7 +40,7 @@ public class WarehouseController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteWarehouse(@PathVariable String id) {
+    public ResponseEntity<?> deleteWarehouse(@PathVariable Long id) {
         warehouseService.deleteWarehouseById(id);
         return ResponseEntity.noContent().build();
     }
