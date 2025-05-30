@@ -17,6 +17,11 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 
+/**
+ * Service responsible for managing client-related operations in the GreenFlow system.
+ * Handles client creation, retrieval, update, and balance queries by interacting with the client repository
+ * and external billing service.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -35,10 +40,22 @@ public class ClientService {
         BILLING_SERVICE_URL = "http://" + BILLING_SERVICE_HOST + "/api/v1/billing";
     }
 
+    /**
+     * Retrieves a client by their unique identifier.
+     *
+     * @param id the unique identifier of the client
+     * @return the ClientDto representation of the client, or null if not found
+     */
     public ClientDto getClientById(String id) {
         return ClientMapper.INSTANCE.toDto(clientRepository.findById(id).orElse(null));
     }
 
+    /**
+     * Saves a new client if the email is not already in use.
+     *
+     * @param clientDto the data transfer object containing client information
+     * @return true if the client was saved successfully, false if the email is already in use
+     */
     public boolean saveClient(UserCreationDto clientDto) {
         if (clientRepository.existsByEmail(clientDto.email())) {
             log.error("Email already in use in client service: {}", clientDto.email());
@@ -53,6 +70,14 @@ public class ClientService {
         return true;
     }
 
+    /**
+     * Updates an existing client with new information.
+     *
+     * @param id the unique identifier of the client to update
+     * @param clientDto the new client data
+     * @return the updated ClientDto
+     * @throws GreenFlowException if the client is not found
+     */
     public ClientDto updateClient(@NotNull String id, @NotNull @Valid ClientDto clientDto) {
         Client client = clientRepository.findById(id).orElse(null);
         if (client == null) {
@@ -67,6 +92,13 @@ public class ClientService {
         return ClientMapper.INSTANCE.toDto(client);
     }
 
+    /**
+     * Retrieves the balance for a client by querying the billing service.
+     *
+     * @param userId the unique identifier of the client
+     * @return the balance as a BigDecimal
+     * @throws GreenFlowException if there is an error communicating with the billing service
+     */
     public BigDecimal getClientBalance(String userId) {
         try {
             BigDecimal response = restTemplate.getForObject(BILLING_SERVICE_URL + "/balance?userId=" + userId,
