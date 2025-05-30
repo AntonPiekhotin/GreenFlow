@@ -7,6 +7,13 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.math.BigDecimal;
 
+/**
+ * Represents a balance change event for a user.
+ *
+ * @param userId      The unique identifier of the user.
+ * @param amount      The amount of the balance change.
+ * @param description An optional description of the balance change.
+ */
 @Builder
 public record BalanceChangeMessage(
         @NonNull String userId,

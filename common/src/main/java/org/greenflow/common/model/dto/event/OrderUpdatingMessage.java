@@ -7,6 +7,14 @@ import java.io.Serializable;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 
+/**
+ * Represents an event where an order is updated.
+ *
+ * @param orderId     The unique identifier of the order.
+ * @param startDate   The start date of the order.
+ * @param description A description of the order update.
+ * @param wage        The updated wage for the order.
+ */
 @Builder
 public record OrderUpdatingMessage(
         String orderId,

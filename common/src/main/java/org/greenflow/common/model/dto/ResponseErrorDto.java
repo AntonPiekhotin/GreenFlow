@@ -11,6 +11,14 @@ import lombok.experimental.FieldDefaults;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Represents an error response with details about the error.
+ *
+ * <p>{@code time}         - The timestamp of the error occurrence.
+ * <p>{@code statusCode}   - The HTTP status code of the error.
+ * <p>{@code errorMessage} - A list of error messages.
+ * <p>{@code stackTrace}   - A list of stack trace elements.
+ */
 @Data
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @AllArgsConstructor

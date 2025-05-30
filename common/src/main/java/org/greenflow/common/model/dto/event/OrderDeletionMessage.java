@@ -10,6 +10,11 @@ import lombok.experimental.FieldDefaults;
 import java.io.Serial;
 import java.io.Serializable;
 
+/**
+ * Represents an event where an order is deleted.
+ *
+ * @param orderId The unique identifier of the order.
+ */
 @Data
 @Builder
 @AllArgsConstructor
