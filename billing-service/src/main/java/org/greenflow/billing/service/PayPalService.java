@@ -22,11 +22,17 @@ import java.text.DecimalFormatSymbols;
 import java.util.List;
 import java.util.Locale;
 
+/**
+ * Service class for handling PayPal payment operations.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class PayPalService {
 
+    /**
+     * The backend host URL, used for constructing return and cancel URLs.
+     */
     @Value("${api.host.backend}")
     private String backendHost;
 
@@ -34,12 +40,19 @@ public class PayPalService {
     private final PaymentRepository paymentRepository;
 
     /**
-     * Створює PayPal Order, зберігає його ID та approveUrl в Payment і повертає URL для редіректу.
+     * Creates a PayPal Order, saves its ID and approval URL in the Payment entity,
+     * and returns the approval URL for redirecting the user.
+     *
+     * @param payment The Payment entity containing details of the payment to be processed.
+     * @return The approval URL for redirecting the user to PayPal.
+     * @throws IOException If an error occurs while communicating with the PayPal API.
      */
     public String createPaymentUrl(Payment payment) throws IOException {
+        // Format the payment amount to two decimal places using US locale.
         DecimalFormat df = new DecimalFormat("0.00", DecimalFormatSymbols.getInstance(Locale.US));
         String amount = df.format(payment.getAmount());
 
+        // Create a PayPal OrderRequest with the payment details.
         OrderRequest orderRequest = new OrderRequest()
                 .checkoutPaymentIntent("CAPTURE")
                 .purchaseUnits(List.of(
@@ -55,18 +68,21 @@ public class PayPalService {
                         .cancelUrl("http://" + backendHost + "/api/v1/billing/cancel/" + payment.getId() + "?cancelled=true")
                 );
 
+        // Send the order creation request to PayPal.
         OrdersCreateRequest request = new OrdersCreateRequest()
                 .requestBody(orderRequest);
 
         HttpResponse<Order> response = client.execute(request);
         Order order = response.result();
 
+        // Extract the approval URL from the PayPal response.
         String approveUrl = order.links().stream()
                 .filter(l -> "approve".equals(l.rel()))
                 .findFirst()
                 .orElseThrow(() -> new IllegalStateException("No approve link in PayPal response"))
                 .href();
 
+        // Update the Payment entity with the external payment ID, approval URL, and status.
         payment.setExternalPaymentId(order.id());
         payment.setExternalPaymentUrl(approveUrl);
         payment.setStatus(PaymentStatus.PENDING);
