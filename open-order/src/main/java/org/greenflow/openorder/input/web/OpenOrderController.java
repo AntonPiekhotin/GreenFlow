@@ -24,7 +24,7 @@ public class OpenOrderController {
 
     @GetMapping
     @PreAuthorize("hasAuthority('WORKER')")
-    public ResponseEntity<?> getOpenOrders(@RequestBody @Valid OpenOrdersRequestDto request) {
+    public ResponseEntity<?> getOpenOrders(@Valid OpenOrdersRequestDto request) {
         var openOrders = openOrderService.getOpenOrdersWithinRadius(request);
         return ResponseEntity.ok(openOrders);
     }
