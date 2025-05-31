@@ -2,6 +2,7 @@ package org.greenflow.client.service;
 
 import jakarta.annotation.PostConstruct;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -107,6 +108,17 @@ public class ClientService {
         } catch (Exception e) {
             log.error("Error occurred while getting client balance", e);
             throw new GreenFlowException(503, "Error occurred while getting client balance");
+        }
+    }
+
+    public String topUpBalance(String userId, @NotNull @DecimalMin("1.0") BigDecimal paymentAmount) {
+        try {
+            String response = restTemplate.postForObject(BILLING_SERVICE_URL + "/topup?userId=" + userId +
+                    "&amount=" + paymentAmount, null, String.class);
+            return response;
+        } catch (Exception e) {
+            log.error("Error occurred while topping up worker balance", e);
+            throw new GreenFlowException(503, "Error occurred while topping up worker balance");
         }
     }
 }

@@ -9,7 +9,6 @@ import org.greenflow.common.model.dto.UserCreationDto;
 import org.greenflow.common.util.InternalAuth;
 import org.greenflow.worker.model.dto.WorkerDto;
 import org.greenflow.worker.service.WorkerService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +21,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.math.BigDecimal;
-import java.net.URI;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/worker")
@@ -64,12 +63,9 @@ public class WorkerController {
 
     @PostMapping("/balance/topup")
     @PreAuthorize("hasAuthority('WORKER')")
-    public ResponseEntity<Void> topUpBalance(@RequestHeader(CustomHeaders.X_USER_ID) String userId,
+    public ResponseEntity<?> topUpBalance(@RequestHeader(CustomHeaders.X_USER_ID) String userId,
                                           @RequestParam("amount") @NotNull @DecimalMin("1.0") BigDecimal paymentAmount) {
         String paymentRedirectUrl = workerService.topUpBalance(userId, paymentAmount);
-        URI redirectUri = URI.create(paymentRedirectUrl);
-        return ResponseEntity.status(HttpStatus.FOUND)
-                .location(redirectUri)
-                .build();
+        return ResponseEntity.ok().body(Map.of("url", paymentRedirectUrl));
     }
 }
