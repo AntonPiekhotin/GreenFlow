@@ -20,6 +20,9 @@ import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
+/**
+ * Service for managing equipment leasing.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -29,6 +32,13 @@ public class LeasingService {
     private final EquipmentLeaseRepository equipmentLeaseRepository;
     private final RabbitMQProducer rabbitMQProducer;
 
+    /**
+     * Requests a lease for equipment.
+     *
+     * @param equipmentId the ID of the equipment to lease
+     * @param lesseeId the ID of the lessee
+     * @return the created lease
+     */
     public EquipmentLease requestLeaseEquipment(@NotBlank String equipmentId, @NotBlank String lesseeId) {
         log.debug("request lease equipment {} from worker {}", equipmentId, lesseeId);
         Equipment equipment = equipmentRepository.findById(equipmentId)
@@ -53,10 +63,22 @@ public class LeasingService {
         return lease;
     }
 
+    /**
+     * Retrieves the list of leased equipment for a lessee.
+     *
+     * @param lesseeId the ID of the lessee
+     * @return the list of leased equipment
+     */
     public List<EquipmentLease> getLeasedEquipment(@NotBlank String lesseeId) {
         return equipmentLeaseRepository.findAllByLesseeId(lesseeId);
     }
 
+    /**
+     * Approves a lease.
+     *
+     * @param leaseId the ID of the lease to approve
+     * @return the approved lease
+     */
     public EquipmentLease approveLease(@NotNull Long leaseId) {
         EquipmentLease lease = equipmentLeaseRepository.findById(leaseId)
                 .orElseThrow(() -> new GreenFlowException(400, "Lease not found"));
@@ -69,6 +91,12 @@ public class LeasingService {
         return equipmentLeaseRepository.save(lease);
     }
 
+    /**
+     * Closes a lease.
+     *
+     * @param leaseId the ID of the lease to close
+     * @return the closed lease
+     */
     public EquipmentLease closeLease(@NotNull Long leaseId) {
         log.debug("request to close lease {}", leaseId);
         EquipmentLease lease = equipmentLeaseRepository.findById(leaseId)

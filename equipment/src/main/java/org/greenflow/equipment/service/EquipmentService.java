@@ -16,6 +16,9 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+/**
+ * Service for managing equipment.
+ */
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -24,6 +27,13 @@ public class EquipmentService {
     private final EquipmentRepository equipmentRepository;
     private final WarehouseRepository warehouseRepository;
 
+    /**
+     * Creates a new equipment item.
+     *
+     * @param equipment the equipment entity to create
+     * @param warehouseId the ID of the warehouse where the equipment is stored
+     * @return the created equipment
+     */
     public Equipment createEquipment(@Valid Equipment equipment, @NotBlank Long warehouseId) {
         if (!warehouseRepository.existsById(warehouseId)) {
             throw new GreenFlowException(400, "Warehouse with id " + warehouseId + " does not exist");
@@ -32,11 +42,23 @@ public class EquipmentService {
         return equipmentRepository.save(equipment);
     }
 
+    /**
+     * Retrieves equipment by its ID.
+     *
+     * @param id the ID of the equipment
+     * @return the equipment entity
+     */
     public Equipment getEquipmentById(@NotBlank String id) {
         return equipmentRepository.findById(id)
                 .orElseThrow(() -> new GreenFlowException(400, "Equipment with id " + id + " does not exist"));
     }
 
+    /**
+     * Retrieves all equipment in a specific warehouse.
+     *
+     * @param warehouseId the ID of the warehouse
+     * @return a list of equipment in the warehouse
+     */
     public List<Equipment> getEquipmentByWarehouseId(@NotBlank Long warehouseId) {
         if (!warehouseRepository.existsById(warehouseId)) {
             throw new GreenFlowException(400, "Warehouse with id " + warehouseId + " does not exist");
@@ -44,6 +66,13 @@ public class EquipmentService {
         return equipmentRepository.findAllByWarehouseId(warehouseId);
     }
 
+    /**
+     * Updates an existing equipment item.
+     *
+     * @param id the ID of the equipment to update
+     * @param equipment the updated equipment entity
+     * @return the updated equipment
+     */
     public Equipment updateEquipment(String id, Equipment equipment) {
         Equipment existingEquipment = equipmentRepository.findById(id)
                 .orElseThrow(() -> new GreenFlowException(400, "Equipment with id " + id + " does not exist"));
@@ -59,6 +88,15 @@ public class EquipmentService {
         equipmentRepository.deleteById(id);
     }
 
+    /**
+     * Finds available equipment near a specified location within a given radius.
+     * @param lat
+     * @param lon
+     * @param radiusKm
+     * @param sortBy
+     * @param sortDir
+     * @return a list of available equipment sorted by the specified criteria
+     */
     public List<Equipment> findAvailableNear(Double lat, Double lon, Double radiusKm,
                                              EquipmentSortBy sortBy, EquipmentSortBy.SortDirection sortDir) {
         double radiusMeters = radiusKm * 1_000;
