@@ -5,6 +5,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.greenflow.authservice.model.entity.role.Role;
+
+import java.util.Set;
 
 @Setter
 @Getter
@@ -14,4 +17,5 @@ import lombok.Setter;
 public class LoginResponse {
     private String username;
     private String jwtToken;
+    private Set<String> roles;
 }

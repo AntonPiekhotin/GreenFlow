@@ -8,6 +8,7 @@ import org.greenflow.authservice.model.dto.LoginRequest;
 import org.greenflow.authservice.model.dto.LoginResponse;
 import org.greenflow.authservice.model.dto.SignupRequest;
 import org.greenflow.authservice.model.entity.User;
+import org.greenflow.authservice.model.entity.role.Role;
 import org.greenflow.authservice.service.AuthService;
 import org.greenflow.authservice.service.security.JwtService;
 import org.greenflow.common.model.dto.ResponseErrorDto;
@@ -21,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/auth")
@@ -44,6 +46,9 @@ public class AuthController {
         LoginResponse response = LoginResponse.builder()
                 .username(user.getEmail())
                 .jwtToken(jwtToken)
+                .roles(user.getRoles().stream()
+                        .map(Role::getAuthority)
+                        .collect(Collectors.toSet()))
                 .build();
         return ResponseEntity.ok(response);
     }
@@ -62,6 +67,9 @@ public class AuthController {
         LoginResponse response = LoginResponse.builder()
                 .username(user.getEmail())
                 .jwtToken(jwtToken)
+                .roles(user.getRoles().stream()
+                        .map(Role::getAuthority)
+                        .collect(Collectors.toSet()))
                 .build();
         return ResponseEntity.status(201).body(response);
     }
