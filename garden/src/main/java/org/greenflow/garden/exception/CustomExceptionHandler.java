@@ -5,6 +5,7 @@ import org.greenflow.common.model.exception.GreenFlowException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -61,6 +62,19 @@ public class CustomExceptionHandler {
         var error = ResponseErrorDto.builder()
                 .statusCode(status)
                 .errorMessage(List.of("Malformed JSON request", e.getMessage()))
+                .stackTrace(Arrays.stream(e.getStackTrace())
+                        .map(StackTraceElement::toString)
+                        .toList())
+                .build();
+        return ResponseEntity.status(status).body(error);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<ResponseErrorDto> handleAccessDeniedException(AccessDeniedException e) {
+        int status = HttpStatus.FORBIDDEN.value();
+        var error = ResponseErrorDto.builder()
+                .statusCode(status)
+                .errorMessage(List.of("Access denied: " + e.getMessage()))
                 .stackTrace(Arrays.stream(e.getStackTrace())
                         .map(StackTraceElement::toString)
                         .toList())
