@@ -109,4 +109,18 @@ public class GardenService {
         log.info("Client {} deleted image from garden {}: {}", userId, gardenId, imageUrl);
         return true;
     }
+
+    public void deleteAllImagesInGarden(String userId, Long gardenId) {
+        Garden garden = gardenRepository.findById(gardenId)
+                .orElseThrow(() -> new GreenFlowException(HttpStatus.NOT_FOUND.value(), "Garden not found"));
+        if (!garden.getOwnerId().equals(userId)) {
+            throw new GreenFlowException(403, "You do not have access to this resource");
+        }
+        for (String imageUrl : garden.getImagesUrl()) {
+            s3ImageService.deleteImage(imageUrl);
+        }
+        garden.getImagesUrl().clear();
+        gardenRepository.save(garden);
+        log.info("Client {} deleted all images from garden {}", userId, gardenId);
+    }
 }

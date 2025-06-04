@@ -1,6 +1,7 @@
 package org.greenflow.garden.input.web;
 
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.greenflow.common.model.constant.CustomHeaders;
 import org.greenflow.garden.model.dto.DeleteImageRequest;
@@ -75,6 +76,15 @@ public class GardenController {
     public ResponseEntity<?> deleteImage(@RequestHeader(CustomHeaders.X_USER_ID) String userId,
                                          @RequestBody @Valid DeleteImageRequest deleteImageRequest) {
         return ResponseEntity.ok(gardenService.deleteImageFromGarden(userId, deleteImageRequest));
+    }
+
+    @DeleteMapping("/imagesю/all")
+    @PreAuthorize("hasAuthority('CLIENT')")
+    public ResponseEntity<?> deleteAllImagesInGarden(@RequestHeader(CustomHeaders.X_USER_ID) String userId,
+                                         @RequestParam("gardenId") @NotNull Long gardenId) {
+        gardenService.deleteAllImagesInGarden(userId, gardenId);
+        return ResponseEntity.status(204).body("All images deleted successfully");
+
     }
 
 }
