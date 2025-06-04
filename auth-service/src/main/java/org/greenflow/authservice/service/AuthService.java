@@ -11,10 +11,12 @@ import org.greenflow.authservice.model.entity.User;
 import org.greenflow.authservice.model.entity.role.RoleType;
 import org.greenflow.authservice.model.entity.role.Roles;
 import org.greenflow.authservice.output.persistent.UserRepository;
+import org.greenflow.common.model.dto.ResponseErrorDto;
 import org.greenflow.common.model.dto.UserCreationDto;
 import org.greenflow.common.model.exception.GreenFlowException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,6 +24,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -65,6 +68,10 @@ public class AuthService {
 
     @Transactional
     public User registerUser(@Valid SignupRequest signUpRequest) {
+        log.info("Registering user: {}", signUpRequest);
+        if (existsByEmail(signUpRequest.getEmail())) {
+            throw new GreenFlowException(400, "Email already in use: " + signUpRequest.getEmail());
+        }
         try {
             log.info("Registering user: {}", signUpRequest);
             User user = new User();

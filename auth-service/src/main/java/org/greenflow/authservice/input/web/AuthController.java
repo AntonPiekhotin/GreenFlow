@@ -55,13 +55,6 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody SignupRequest signUpRequest) {
-        log.info("Registering user: {}", signUpRequest);
-        if (authService.existsByEmail(signUpRequest.getEmail())) {
-            return ResponseEntity.badRequest().body(ResponseErrorDto.builder()
-                    .statusCode(400)
-                    .errorMessage(List.of("Email is already in use!"))
-                    .build());
-        }
         User user = authService.registerUser(signUpRequest);
         String jwtToken = jwtService.generateToken(user);
         LoginResponse response = LoginResponse.builder()
