@@ -4,6 +4,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 import org.greenflow.common.model.constant.CustomHeaders;
+import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.garden.model.dto.DeleteImageRequest;
 import org.greenflow.garden.model.dto.GardenDto;
 import org.greenflow.garden.model.entity.Garden;
@@ -68,6 +69,13 @@ public class GardenController {
     public ResponseEntity<?> uploadImage(@RequestHeader(CustomHeaders.X_USER_ID) String userId,
                                          @RequestParam("file") MultipartFile imageFile,
                                          @RequestParam("gardenId") Long gardenId) {
+        List<String> allowedContentTypes = List.of("image/jpeg", "image/png", "image/gif", "image/webp");
+
+        if (imageFile.isEmpty())
+            throw new GreenFlowException(400, "Image file is empty.");
+        if (!allowedContentTypes.contains(imageFile.getContentType()))
+            throw new GreenFlowException(400, "Invalid image file type. Allowed types: " + allowedContentTypes);
+
         return ResponseEntity.ok(gardenService.addImageToGarden(userId, gardenId, imageFile));
     }
 
@@ -81,7 +89,7 @@ public class GardenController {
     @DeleteMapping("/imagesю/all")
     @PreAuthorize("hasAuthority('CLIENT')")
     public ResponseEntity<?> deleteAllImagesInGarden(@RequestHeader(CustomHeaders.X_USER_ID) String userId,
-                                         @RequestParam("gardenId") @NotNull Long gardenId) {
+                                                     @RequestParam("gardenId") @NotNull Long gardenId) {
         gardenService.deleteAllImagesInGarden(userId, gardenId);
         return ResponseEntity.status(204).body("All images deleted successfully");
 
