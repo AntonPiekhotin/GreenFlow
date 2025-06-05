@@ -1,6 +1,6 @@
 package org.greenflow.equipment.output.persistent;
 
-import org.greenflow.equipment.model.constant.LeasingStatus;
+import org.greenflow.equipment.model.constant.EquipmentStatus;
 import org.greenflow.equipment.model.entity.Equipment;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -17,7 +17,7 @@ public interface EquipmentRepository extends MongoRepository<Equipment, String> 
 
     List<Equipment> findByWarehouseIdInAndStatus(
             List<Long> warehouseIds,
-            LeasingStatus status,
+            EquipmentStatus status,
             Sort sort
     );
 

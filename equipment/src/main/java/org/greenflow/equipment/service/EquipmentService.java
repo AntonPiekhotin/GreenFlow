@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.greenflow.common.model.exception.GreenFlowException;
 import org.greenflow.equipment.model.constant.EquipmentSortBy;
-import org.greenflow.equipment.model.constant.LeasingStatus;
+import org.greenflow.equipment.model.constant.EquipmentStatus;
 import org.greenflow.equipment.model.entity.Equipment;
 import org.greenflow.equipment.model.entity.Warehouse;
 import org.greenflow.equipment.output.persistent.EquipmentRepository;
@@ -109,7 +109,7 @@ public class EquipmentService {
         Sort sort = Sort.by(direction, sortBy.getFieldName());
 
         return equipmentRepository
-                .findByWarehouseIdInAndStatus(warehouseIds, LeasingStatus.AVAILABLE, sort)
+                .findByWarehouseIdInAndStatus(warehouseIds, EquipmentStatus.AVAILABLE, sort)
                 .stream()
                 .toList();
     }

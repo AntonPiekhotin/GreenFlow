@@ -85,8 +85,13 @@ public class LeasingService {
         if (lease.getStatus() != LeasingStatus.PENDING) {
             throw new GreenFlowException(400, "Lease is not pending");
         }
+        Equipment equipment = equipmentRepository.findById(lease.getEquipmentId())
+                .orElseThrow(() -> new GreenFlowException(400, "Equipment not found"));
         lease.setStatus(LeasingStatus.ACTIVE);
         lease.setStartDate(LocalDateTime.now());
+
+        equipment.setStatus(EquipmentStatus.LEASED);
+        equipmentRepository.save(equipment);
         log.info("Lease {} approved", leaseId);
         return equipmentLeaseRepository.save(lease);
     }
