@@ -86,7 +86,7 @@ public class GardenController {
         return ResponseEntity.ok(gardenService.deleteImageFromGarden(userId, deleteImageRequest));
     }
 
-    @DeleteMapping("/imagesю/all")
+    @DeleteMapping("/images/all")
     @PreAuthorize("hasAuthority('CLIENT')")
     public ResponseEntity<?> deleteAllImagesInGarden(@RequestHeader(CustomHeaders.X_USER_ID) String userId,
                                                      @RequestParam("gardenId") @NotNull Long gardenId) {
